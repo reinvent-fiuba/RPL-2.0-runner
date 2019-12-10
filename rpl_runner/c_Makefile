@@ -14,4 +14,7 @@ main: $(ARCHIVOS:.c=.o)
 clean:
 	rm -f main *.o *.d
 
+run:
+	./main
+
 .PHONY: main clean

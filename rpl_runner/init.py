@@ -5,9 +5,25 @@ import sys
 import shutil
 import json
 
-from runner_c import CRunner, RunnerError
+from custom_runner import CRunner, PythonRunner
+from runner import RunnerError
+
+custom_runners = {"c": CRunner, "python": PythonRunner}
+
+
+def parse_args():
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--lang', help='Language of the assignment')
+
+    return parser.parse_args()
 
 def main():
+
+    args = parse_args()
+    lang = args.lang
+
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
     # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
     # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
@@ -18,7 +34,7 @@ def main():
             with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stdout, \
                     tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stderr:
 
-                runner = CRunner(tmpdir, "IO", my_stdout, my_stderr)
+                runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
 
                 result = {}
                 try:

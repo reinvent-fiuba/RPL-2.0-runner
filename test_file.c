@@ -11,7 +11,7 @@ float seg;
     scanf ("%d",&tiempo_ingresado);
     //printf ("%d\n",tiempo_ingresado);
     //seg = 3661; Para poner numeros de prueba.
-    hs = (int) tiempo_ingresado / 3600
+    hs = (int) tiempo_ingresado / 3600;
     tiempo_ingresado = tiempo_ingresado % 3600;
     min = tiempo_ingresado / 60;
     seg = tiempo_ingresado % 60;

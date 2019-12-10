@@ -6,9 +6,9 @@ RUN apt-get update     && \
                        make valgrind time python3.7 	\
                        libgtest-dev
 
-COPY ["*.py", "Makefile", "/"]
+COPY ["*.py", "*_Makefile", "/"]
 
 WORKDIR /tmp
 
 
-ENTRYPOINT ["/usr/bin/python3.7", "/runner.py"]
+ENTRYPOINT ["/usr/bin/python3.7", "/init.py"]

@@ -1,0 +1,8 @@
+ARCHIVOS = $(wildcard *.py)
+
+build: $(ARCHIVOS)
+	/usr/bin/python3.7 -m py_compile  $^
+
+
+run:
+	/usr/bin/python3.7 main.py
