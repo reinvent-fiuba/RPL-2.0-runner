@@ -14,7 +14,8 @@ def callback(ch, method, properties, body):
     decoded = body.decode("utf-8")
     print(f" [x] Received {decoded}")
 
-    receiver.ejecutar(decoded)
+    subm, lang = decoded.split()
+    receiver.ejecutar(subm, lang)
 
 
 channel.basic_consume(

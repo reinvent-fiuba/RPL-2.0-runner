@@ -25,13 +25,13 @@ python3 rabbitmq_receive.py
 3.- Send messages with 
 
 ```sh
-python3 rabbitmq_send.py <submission_id>
+python3 rabbitmq_send.py <submission_id> <lang>
 ```
 
 
 ### Without rabbitmq
 ```sh
-docker build -t rpl-2.0-runner . && python3 receiver.py
+docker build -t rpl-2.0-runner . && python3 receiver.py <lang>
 ```
 
 ## rabbitmq_send.py
@@ -46,7 +46,7 @@ Get submission from RPL
 invoques NEW DOCKER PROCESS with a custom runner for a language in a docker container
 Post results to RPL
 
-## runner.py and runner_c.py (RUNNING INSIDE DOCKER CONTAINER)
+## init.py, runner.py and custom_runner.py (RUNNING INSIDE DOCKER CONTAINER)
 1. Prepare
 2. Build
 3. Run

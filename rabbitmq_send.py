@@ -9,6 +9,6 @@ channel = connection.channel()
 
 channel.queue_declare(queue='hello')
 
-channel.basic_publish(exchange='', routing_key='hello', body=sys.argv[1])
-print(f" [x] Sent '{sys.argv[1]}'!")
+channel.basic_publish(exchange='', routing_key='hello', body=sys.argv[1] + ' ' + sys.argv[2])
+print(f" [x] Sent '{sys.argv[1]}' '{sys.argv[2]}'!")
 connection.close()
