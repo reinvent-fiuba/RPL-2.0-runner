@@ -5,4 +5,4 @@ build: $(ARCHIVOS)
 
 
 run:
-	/usr/bin/python3.7 main.py
+	/usr/bin/python3.7 assignment_main.py

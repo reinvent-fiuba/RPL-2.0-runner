@@ -91,13 +91,21 @@ class Runner:
         return run_cmd.returncode
 
     def generate_files(self):
-        pass
+        raise NotImplementedError()
+
 
     def build_cmd(self):
-        pass
+        return subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL, 
+                stdout=subprocess.PIPE, stderr=self.stderr)
 
     def run_cmd(self):
-        raise NotImplementedError()
+        if self.test_type == "IO":
+            with open(self.path + "/input.txt") as test_in:
+                return subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=test_in,
+                        stdout=subprocess.PIPE, stderr=self.stderr)
+        else:
+            return subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=test_in,
+                        stdout=subprocess.PIPE, stderr=self.stderr)
 
 
 def get_logger(stdout):

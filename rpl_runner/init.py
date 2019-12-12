@@ -4,6 +4,7 @@ import tarfile
 import sys
 import shutil
 import json
+import io
 
 from custom_runner import CRunner, PythonRunner
 from runner import RunnerError
@@ -28,7 +29,14 @@ def main():
     # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
     # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
     # seekable.
-        with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tar:
+
+        with open("assignment.tar.gx", "wb") as assignment:
+            assignment.write(sys.stdin.buffer.read())
+        
+
+
+        # with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tar:
+        with tarfile.open("assignment.tar.gx") as tar:
             tar.extractall(tmpdir)
 
             with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stdout, \
@@ -54,7 +62,7 @@ def main():
                 result["stdout"] = my_stdout.read()
                 result["stderr"] = my_stderr.read()
 
-                print(json.dumps(result, indent=4))
+                print(json.dumps(result, indent=4)) # Contenido que obtiene el proceso que ejecuta el contenedor docker
 
 
 

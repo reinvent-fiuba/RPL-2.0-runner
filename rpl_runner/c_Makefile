@@ -8,11 +8,8 @@ VALGRIND = valgrind --leak-check=full --track-origins=yes --show-reachable=yes -
 
 ARCHIVOS = $(wildcard *.c)
 
-main: $(ARCHIVOS:.c=.o)
-	$(CC) -o $@ $^
-
-clean:
-	rm -f main *.o *.d
+build: $(ARCHIVOS:.c=.o)
+	$(CC) -o main $^
 
 run:
 	./main
