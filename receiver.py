@@ -5,12 +5,13 @@ import time
 import json
 import sys
 import requests
+import io
 
 def main():
-  ejecutar(1, sys.argv[1] if len(sys.argv) > 1 else 'c')
+  ejecutar(int(sys.argv[1]) if len(sys.argv) > 1 else 1, sys.argv[1] if len(sys.argv) > 2 else 'c_std11')
 
 
-def ejecutar(submission_id, lang='c'):
+def ejecutar(submission_id, lang='c_std11'):
   """Función principal del script.
   """
   with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
@@ -18,6 +19,8 @@ def ejecutar(submission_id, lang='c'):
     solution_tar = "tar_assignment_solved_c.tar.gz"  # Obtener a partir del id del mensaje
     #Cuando salgo de aca se deberia eliminar todo lo relacionado con esta entrega ya que vive en este directorio temporal
 
+    print(f"Obteniendo submission data {submission_id}....")
+    #GET SUBMISSION
     response = requests.get(f"http://localhost:8080/api/submissions/{submission_id}")
 
     print(json.dumps(response.json(), indent=4))
@@ -27,23 +30,56 @@ def ejecutar(submission_id, lang='c'):
 
     submission = response.json()
 
-    file_id = submission['file_id']
-    file_name = submission['file_name']
+    ## SUBMISSION AND ACTIVITY DETAILS
+
+    submission_file_id = submission['submission_file_id']
+    submission_file_name = submission['submission_file_id']
+
+    activity_supporting_file_id = submission['activity_supporting_file_id']
+    activity_supporting_file_name = submission['activity_supporting_file_name']
+    
+    activity_unit_tests = submission['activity_unit_tests']
+    activity_io_tests = submission['activity_iotests']
+    
     activity_language = submission['activity_language']
 
+    # ---------------------------------------------------------
 
-    file_response = requests.get(f"http://localhost:8080/api/files/{file_id}")
+    print(f"Obteniendo submission files {submission_file_id}....")
+    #GET SUBMISSION FILES
+    submission_file_response = requests.get(f"http://localhost:8080/api/files/{submission_file_id}")
 
-    if file_response.status_code != 200:
-      raise Exception("Error al obtener el comprimido")
+    if submission_file_response.status_code != 200:
+      raise Exception("Error al obtener el comprimido de submission")
+
+    with open(tmpdir + '/submission_files.tar.gz', 'wb') as sf:
+        sf.write(submission_file_response.content)
+
+    # ---------------------------------------------------------
+
+    print(f"Obteniendo activity files {activity_supporting_file_id}....")
+    
+    if activity_supporting_file_id:
+      #GET ACTIVITY FILES
+      activity_file_response = requests.get(f"http://localhost:8080/api/files/{activity_supporting_file_id}")
+
+      with open(tmpdir +"/activity_files.tar.gz", 'wb') as af:
+        af.write(activity_file_response.content)
+    else:
+      print("NO HAY ACTIVITY FILES")
 
 
-    with open('PROBANDO_' + file_name, 'wb') as f:
-        f.write(file_response.content)
+    # print(f"Obteniendo activity IO tests {file_id}....")
+    #GET IO TEST FILES
+    # IO_test_file_response = requests.get(f"http://localhost:8080/api/activities/{activity_id}/")
+
+    # print(f"Obteniendo activity unit test file {file_id}....")
+    #GET UNIT TEST FILES
+    # unit_test_file_response = requests.get(f"http://localhost:8080/api/files/{file_id}")
 
 
-    print(f"Obteniendo submission {submission_id}....")
-    time.sleep(1) #ahre
+# ---------------------------------------------------------
+
     print(f"Submission obtenida: {solution_tar}")
 
     print("Ejecutando codigo en contenedor docker")
@@ -55,17 +91,46 @@ def ejecutar(submission_id, lang='c'):
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT) as worker:
 
-      print(type(file_response.content))
-      worker.stdin.write(file_response.content)
+      # print(type(submission_file_response.content))
+      # worker.stdin.write(submission_file_response.content)
+    # with open("holaaaaa", "w") as _:
 
 
-      # tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
+      tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
+      # tar = tarfile.open("pruebita.tar.gz", mode="w|", dereference=True)
       # tar.add("input.txt")
       # tar.add("output.txt")
       # tar.add("test_file.c")
       # tar.add("main.py")
+      
 
-      # tar.close()
+      # Agrego archivos de la submission
+      with tarfile.open(tmpdir + '/submission_files.tar.gz') as submission_tar:
+        for member_tarinfo in submission_tar.getmembers():
+          member_fileobj = submission_tar.extractfile(member_tarinfo)
+          tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
+
+      # Agrego archivos de la activity
+      if activity_supporting_file_id:
+        with tarfile.open(tmpdir + '/activity_files.tar.gz') as activiy_files_tar:
+          for member_tarinfo in activiy_files_tar.getmembers():
+            member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
+            tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
+
+      # if activity_unit_tests:
+      #   # Agrego archivo de test unitario
+      #   unit_test_info = tarfile.TarInfo(name="unit_tests.c")
+      #   unit_test_info.size = len(activity_unit_tests)
+      #   tar.addfile(tarinfo=unit_test_info, fileobj=io.StringIO(activity_unit_tests))
+
+      if activity_io_tests:
+        # Agrego archivo de test IO
+        for i, io_test in enumerate(activity_io_tests):
+          IO_test_info = tarfile.TarInfo(name=f"IO_test_{i}.txt")
+          IO_test_info.size = len(io_test)
+          tar.addfile(tarinfo=IO_test_info, fileobj=io.BytesIO(io_test.encode("utf-8")))
+
+      tar.close()
 
 
       stdout, _ = worker.communicate()

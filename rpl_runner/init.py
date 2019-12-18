@@ -9,7 +9,7 @@ import io
 from custom_runner import CRunner, PythonRunner
 from runner import RunnerError
 
-custom_runners = {"c": CRunner, "python": PythonRunner}
+custom_runners = {"c_std11": CRunner, "python_3.7": PythonRunner}
 
 
 def parse_args():
@@ -32,13 +32,14 @@ def main():
 
         with open("assignment.tar.gx", "wb") as assignment:
             assignment.write(sys.stdin.buffer.read())
-        
 
 
         # with tarfile.open(fileobj=sys.stdin.buffer, mode="r|") as tar:
         with tarfile.open("assignment.tar.gx") as tar:
             tar.extractall(tmpdir)
 
+            # Escribimos todo en archivos temporarios para despues poder devolverlo
+            # y que el usuario vea que paso en su corrida
             with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stdout, \
                     tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stderr:
 
