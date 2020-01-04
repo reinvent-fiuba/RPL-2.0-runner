@@ -11,6 +11,10 @@ class RunnerError(Exception):
         self.message = message
 
 class Runner:
+    '''
+    Base clase with the necessary steps to prepare, build and run an assignment
+    either with unit tests or IO tests.
+    '''
     
     BUILD_TIMEOUT = 20
     RUN_TIMEOUT = 60
@@ -26,7 +30,24 @@ class Runner:
         self.stderr = stderr
         self.logger = get_logger(stdout)
 
+
+    def process(self):
+        '''
+        Only public function. Does all the work.
+        - generate_files must be implemented by a custom runner extending this class.
+        - Build depends onthe custom runner's generated Makefile and executes 'make -k build'
+        - Run command just executes 'make -k run' and pipes the input files in case it IO tested
+        '''
+        self.generate_files()
+        self.build()
+        return self.run()
+
+
     def exec_cmd(self, cmd, timeout):
+        '''
+        Executes a single command and logs the output.
+        Receives the command name (just for logging) and the actual subprocess.Popen instance
+        '''
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
         try:
@@ -42,6 +63,7 @@ class Runner:
         
         return output
 
+
     def exec_cmds(self, cmds, timeout):
         '''Lo mismo que la de arriba pero muchos comandos'''
         results = []
@@ -49,29 +71,13 @@ class Runner:
             results.append(self.exec_cmd(cmd, timeout))
         return results
 
-    def my_print(self, m):
-        print(m, file=self.stdout)
-
-    def log_divider(self, message, fill, align, width):
-        self.my_print('{message:{fill}{align}{width}}'.format(
-            message=message,
-            fill=fill,
-            align=align,
-            width=width,
-        ))
-
-    def log(self, output):
-        # self.log_divider(f"{self.stage} OUTPUT:", ":", '^', 150)
-        self.my_print(output)
-        # self.log_divider(f"END {self.stage} OUTPUT:", ":", '^', 150)
-
-    def process(self):
-        self.generate_files()
-        self.build()
-        return self.run()
-
 
     def build(self):
+        '''
+        Build process.
+        If build fails raises RunnerError.
+        Heavily depends on the generated Makefile in the generate_files step.
+        '''
         self.stage = "BUILD"
         self.logger.info("Build Started")
         build_cmd = self.build_cmd()
@@ -86,6 +92,11 @@ class Runner:
 
 
     def run(self):
+        '''
+        Run process.
+        If returncode is not 0, raises RunnerError.
+        Heavily depends on the generated Makefile in the generate_files step.
+        '''
         self.logger.info("Run Started")
 
         self.stage = "RUN"
@@ -102,7 +113,13 @@ class Runner:
         self.logger.info("Run Ended")
         return 0
 
+
     def generate_files(self):
+        '''
+        Step aimed to prepare the environment for the assignment to be successfuly run, this includes:
+            - Adding a custom Makefile  <----- IMPORTANT ----->
+            - Any extra files the activity needs
+        '''
         raise NotImplementedError()
 
 
@@ -110,7 +127,12 @@ class Runner:
         return ("Building", subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL, 
                 stdout=subprocess.PIPE, stderr=self.stderr))
 
+
     def run_cmd(self):
+        '''
+        Returns a list of tuples with the structure (<process_name>, <subprocess.Popen instante>)
+        If it's an IO test, there will probably be multiple test scenarios therefore many runs.
+        '''
         runs = []
         if self.test_type == "IO":
             cwd = Path(self.path)
@@ -127,6 +149,22 @@ class Runner:
             return [("Running Unit Tests", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
                         stdout=subprocess.PIPE, stderr=self.stderr))]
         return runs
+
+    def my_print(self, m):
+        print(m, file=self.stdout)
+
+    def log_divider(self, message, fill, align, width):
+        self.my_print('{message:{fill}{align}{width}}'.format(
+            message=message,
+            fill=fill,
+            align=align,
+            width=width,
+        ))
+
+    def log(self, output):
+        # self.log_divider(f"{self.stage} OUTPUT:", ":", '^', 150)
+        self.my_print(output)
+        # self.log_divider(f"END {self.stage} OUTPUT:", ":", '^', 150)
 
 
 def get_logger(stdout):
