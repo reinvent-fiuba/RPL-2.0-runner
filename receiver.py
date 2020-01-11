@@ -136,7 +136,9 @@ def ejecutar(submission_id, lang='c_std11'):
 
       print(f"Código de retorno de ejecución: {retcode}")
 
-      # mandar resultado (json_output/result) POST al backend
+      # TODO: mandar resultado (json_output/result) POST al backend
+
+      # curl --request POST --url http://localhost:8080/api/submissions/2/result
 
 
     # except Timeout:

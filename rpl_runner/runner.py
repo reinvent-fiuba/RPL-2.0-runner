@@ -50,6 +50,7 @@ class Runner:
         '''
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
+        self.logger.info(f"start_{self.stage}")
         try:
             output, _ = cmd_cmd.communicate(timeout)
             
@@ -60,6 +61,7 @@ class Runner:
 
         output = output.decode("utf-8", "replace").rstrip()
         self.log(output)
+        self.logger.info(f"end_{self.stage}")
         
         return output
 

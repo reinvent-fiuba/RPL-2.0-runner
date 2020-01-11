@@ -68,13 +68,32 @@ def main():
                 my_stderr.seek(0)
                 result["stdout"] = my_stdout.read()
                 result["stderr"] = my_stderr.read()
+                result["stdout_only_run"] = parse_stdout(result["stdout"])
 
                 # Escribimos en el stdout del proceso por única vez
                 print(json.dumps(result, indent=4)) # Contenido que recibe el proceso que ejecuta el contenedor docker
 
+
+def parse_stdout(log_stdout):
+    '''
+    Devuelve una lista de todas las salidas de las corridas SIN EL LOGGING.
+    Se identifica como salida del programa a todo el stdout entre el log start_RUN y end_RUN
+    '''
+    results = []
+    result = ""
+    for line in log_stdout.split('\n'):
+        if "end_RUN" in line:
+            results.append(result.strip("./main"))
+
+        elif "start_RUN" in line:
+            result = ""
+
+        else:
+            result += line
+
+    return results
+
 main()
-
-
 
 # Funciones para probar
 
