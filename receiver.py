@@ -74,6 +74,15 @@ def ejecutar(submission_id, lang='c_std11'):
 
     print(f"Submission obtenida: {solution_tar}")
 
+
+    print("Actualizando submission: PROCESSING")
+    response = requests.put(f"http://localhost:8080/api/submissions/{submission_id}", json={"status":"PROCESSING"})
+    if response.status_code != 200:
+      raise Exception(f"Error al actualizar el estado de la submission: {response.json()}")
+
+
+    # ---------------------------------------------------------
+
     print("Ejecutando codigo en contenedor docker")
     # Lanzar ya el proceso worker para poder pasar su stdin a tarfile.open().
     # --rm --> clean up container after run
@@ -128,17 +137,19 @@ def ejecutar(submission_id, lang='c_std11'):
       # print(result)
 
       print("################## STDOUT ######################")
-      print(result["stdout"])
+      print(result["test_run_stdout"])
       print("################## STDOUT ######################")
       print("################## STDERR ######################")
-      print(result["stderr"])
+      print(result["test_run_stderr"])
       print("################## STDERR ######################")
 
       print(f"Código de retorno de ejecución: {retcode}")
 
-      # TODO: mandar resultado (json_output/result) POST al backend
-
-      # curl --request POST --url http://localhost:8080/api/submissions/2/result
+      
+      # mandar resultado (json_output/result) POST al backend
+      response = requests.post(f"http://localhost:8080/api/submissions/{submission_id}/result", json=result)
+      if response.status_code != 201:
+        raise Exception(f"Error al postear el resultado de la submission: {response.json()}")
 
 
     # except Timeout:

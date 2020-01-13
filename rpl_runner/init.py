@@ -54,21 +54,21 @@ def main():
                 try:
                     # Comenzamos la corrida
                     runner.process()
-                    result["result"] = "OK"
-                    result["stage"] = "COMPLETE"
-                    result["message"] = "Completed all stages"
+                    result["test_run_result"] = "OK"
+                    result["test_run_stage"] = "COMPLETE"
+                    result["test_run_exit_message"] = "Completed all stages"
                 except RunnerError as e:
-                    result["result"] = "ERROR"
-                    result["stage"] = e.stage
-                    result["message"] = e.message
+                    result["test_run_result"] = "ERROR"
+                    result["test_run_stage"] = e.stage
+                    result["test_run_exit_message"] = e.message
 
                     # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
 
                 my_stdout.seek(0)
                 my_stderr.seek(0)
-                result["stdout"] = my_stdout.read()
-                result["stderr"] = my_stderr.read()
-                result["stdout_only_run"] = parse_stdout(result["stdout"])
+                result["test_run_stdout"] = my_stdout.read()
+                result["test_run_stderr"] = my_stderr.read()
+                result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
 
                 # Escribimos en el stdout del proceso por única vez
                 print(json.dumps(result, indent=4)) # Contenido que recibe el proceso que ejecuta el contenedor docker
