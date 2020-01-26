@@ -15,9 +15,12 @@ def callback(ch, method, properties, body):
     print(f" [x] Received {decoded}")
 
     subm, lang = decoded.split()
-    receiver.ejecutar(subm, lang)
 
-    ch.basic_ack(delivery_tag = method.delivery_tag)
+    try:
+        receiver.ejecutar(subm, lang)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
+    except:
+        pass
 
 
 

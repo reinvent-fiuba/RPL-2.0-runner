@@ -27,6 +27,9 @@ def ejecutar(submission_id, lang='c_std11'):
 
     print(json.dumps(response.json(), indent=4))
     
+    if response.status_code == 404:
+      return
+
     if response.status_code != 200:
       raise Exception("Error al obtener la Submission")
 
@@ -35,7 +38,7 @@ def ejecutar(submission_id, lang='c_std11'):
     ## SUBMISSION AND ACTIVITY DETAILS
 
     submission_file_id = submission['submission_file_id']
-    submission_file_name = submission['submission_file_id']
+    submission_file_name = submission['submission_file_name']
 
     activity_supporting_file_id = submission['activity_supporting_file_id']
     activity_supporting_file_name = submission['activity_supporting_file_name']
@@ -81,6 +84,9 @@ def ejecutar(submission_id, lang='c_std11'):
       raise Exception(f"Error al actualizar el estado de la submission: {response.json()}")
 
 
+    # print(tmpdir + '/submission_files.tar.gz')
+    # input()
+
     # ---------------------------------------------------------
 
     print("Ejecutando codigo en contenedor docker")
@@ -94,6 +100,8 @@ def ejecutar(submission_id, lang='c_std11'):
 
       tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
       
+      
+      print("Agrego archivos de la submission")
       # Agrego archivos de la submission
       with tarfile.open(tmpdir + '/submission_files.tar.gz') as submission_tar:
         for member_tarinfo in submission_tar.getmembers():
@@ -102,6 +110,7 @@ def ejecutar(submission_id, lang='c_std11'):
 
       # Agrego archivos de la activity
       if activity_supporting_file_id:
+        print("Agrego archivos de la activity")
         with tarfile.open(tmpdir + '/activity_files.tar.gz') as activiy_files_tar:
           for member_tarinfo in activiy_files_tar.getmembers():
             member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
@@ -113,7 +122,9 @@ def ejecutar(submission_id, lang='c_std11'):
       #   unit_test_info.size = len(activity_unit_tests)
       #   tar.addfile(tarinfo=unit_test_info, fileobj=io.BytesIO(activity_unit_tests.encode("utf-8")))
 
+      
       if activity_io_tests:
+        print("Agrego archivos de IO test")
         # Agrego archivo de test IO
         for i, io_test in enumerate(activity_io_tests):
           IO_test_info = tarfile.TarInfo(name=f"IO_test_{i}.txt")

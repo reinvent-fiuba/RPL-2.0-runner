@@ -139,9 +139,8 @@ class Runner:
         if self.test_type == "IO":
             cwd = Path(self.path)
             io_input_files = cwd.glob('IO_test_*')
-            if not io_input_files:
+            if len(list(io_input_files)) == 0:
                 raise Exception("NO HAY INPUT FILES")
-                return
 
             for input_file in sorted(io_input_files):                
                 f = open(input_file.resolve().as_posix(), "r")  # We don't care about resourses of a disposable docker container
