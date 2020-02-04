@@ -48,8 +48,8 @@ def main():
                     tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stderr:
 
                 # Obtenemos el runner del lenguaje seleccionado
-                # runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
-                runner = custom_runners[lang](tmpdir, "unit_test", my_stdout, my_stderr)
+                runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
+                # runner = custom_runners[lang](tmpdir, "unit_test", my_stdout, my_stderr)
 
                 result = {}
                 try:

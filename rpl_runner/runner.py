@@ -47,6 +47,7 @@ class Runner:
         '''
         Executes a single command and logs the output.
         Receives the command name (just for logging) and the actual subprocess.Popen instance
+        Everything between 'start_*' and 'end_*' is what the student will see as output.
         '''
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
@@ -135,14 +136,25 @@ class Runner:
         Returns a list of tuples with the structure (<process_name>, <subprocess.Popen instante>)
         If it's an IO test, there will probably be multiple test scenarios therefore many runs.
         '''
+        # cmd_cmd = subprocess.Popen(["ls", "-la"], cwd=self.path, stdin=subprocess.DEVNULL,
+        #                     stdout=subprocess.PIPE, stderr=self.stderr)
+
+        # output, _ = cmd_cmd.communicate()
+
+        # output = output.decode("utf-8", "replace").rstrip()
+        # self.log(output)
+
+
+
         runs = []
         if self.test_type == "IO":
             cwd = Path(self.path)
-            io_input_files = cwd.glob('IO_test_*')
-            if len(list(io_input_files)) == 0:
+            io_input_files = list(cwd.glob('IO_test_*'))
+
+            if len(io_input_files) == 0:
                 raise Exception("NO HAY INPUT FILES")
 
-            for input_file in sorted(io_input_files):                
+            for input_file in sorted(io_input_files):
                 f = open(input_file.resolve().as_posix(), "r")  # We don't care about resourses of a disposable docker container
                 runs.append((f"IO TEST: {input_file.name}", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=f,
                             stdout=subprocess.PIPE, stderr=self.stderr)))
