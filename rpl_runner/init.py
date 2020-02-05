@@ -84,10 +84,13 @@ def parse_stdout(log_stdout):
     result = ""
     for line in log_stdout.split('\n'):
         if "end_RUN" in line:
-            results.append(result.strip("./main"))
+            results.append(result)
 
         elif "start_RUN" in line:
             result = ""
+
+        elif "assignment_main.py" in line or "./main" in line:
+            continue
 
         else:
             result += line
