@@ -129,6 +129,8 @@ class Runner:
     def build_cmd(self):
         return ("Building", subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL, 
                 stdout=subprocess.PIPE, stderr=self.stderr))
+        # return ("Building", subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"], cwd=self.path, stdin=subprocess.DEVNULL, 
+                # stdout=subprocess.PIPE, stderr=self.stderr))
 
 
     def run_cmd(self):

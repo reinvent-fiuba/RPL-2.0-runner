@@ -48,13 +48,23 @@ def main():
                     tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stderr:
 
                 # Obtenemos el runner del lenguaje seleccionado
-                runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
-                # runner = custom_runners[lang](tmpdir, "unit_test", my_stdout, my_stderr)
+                # io_runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
+
+                ls = subprocess.run(["ls", "-l"], cwd=tmpdir, capture_output=True, text=True)
+                ls_output = ls.stdout
+                if "unit_test" in ls_output:
+                    mode = "unit_test"
+                else:
+                    mode = "IO"
+
+
+                unit_test_runner = custom_runners[lang](tmpdir, mode, my_stdout, my_stderr)
 
                 result = {}
                 try:
                     # Comenzamos la corrida
-                    runner.process()
+                    # io_runner.process()
+                    unit_test_runner.process() # writes stuff to my_stdout and my_stderr
                     result["test_run_result"] = "OK"
                     result["test_run_stage"] = "COMPLETE"
                     result["test_run_exit_message"] = "Completed all stages"
@@ -97,14 +107,17 @@ def parse_stdout(log_stdout):
 
     return results
 
-main()
 
 # Funciones para probar
 
-def pwd():
-    pwd = subprocess.run(["pwd"], cwd=tmpdir, capture_output=True, text=True)
+def pwd(dir):
+    pwd = subprocess.run(["pwd"], cwd=dir, capture_output=True, text=True)
     print(pwd.stdout, file=sys.stderr)
 
-def ls():
-    ls = subprocess.run(["ls", "-l"], cwd=tmpdir, capture_output=True, text=True)
+def ls(dir):
+    ls = subprocess.run(["ls", "-l"], cwd=dir, capture_output=True, text=True)
     print(ls.stdout, file=sys.stderr)
+
+
+
+main()

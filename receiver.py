@@ -11,6 +11,13 @@ def main():
   ejecutar(int(sys.argv[1]) if len(sys.argv) > 1 else 1, sys.argv[2] if len(sys.argv) > 2 else 'c_std11')
 
 
+def getUnitTestExtension(lang):
+  if "python" in lang:
+    return "py"
+  if "java" in lang:
+    return "java"
+  return "c"
+
 def ejecutar(submission_id, lang='c_std11'):
   """
   Función principal del script.
@@ -43,10 +50,12 @@ def ejecutar(submission_id, lang='c_std11'):
     activity_supporting_file_id = submission['activity_supporting_file_id']
     activity_supporting_file_name = submission['activity_supporting_file_name']
     
-    activity_unit_tests = submission['activity_unit_tests'] # string with unit_test content
+    activity_unit_test_file_content = submission['activity_unit_tests_content'] # string with unit_test content
     activity_io_tests = submission['activity_iotests']  # Array of strings (input part of IO tests)
     
     activity_language = submission['activity_language']
+
+    print(activity_unit_test_file_content)
 
     # ---------------------------------------------------------
 
@@ -116,11 +125,11 @@ def ejecutar(submission_id, lang='c_std11'):
             member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
             tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
 
-      # if activity_unit_tests:
-      #   # Agrego archivo de test unitario
-      #   unit_test_info = tarfile.TarInfo(name="unit_test.c")
-      #   unit_test_info.size = len(activity_unit_tests)
-      #   tar.addfile(tarinfo=unit_test_info, fileobj=io.BytesIO(activity_unit_tests.encode("utf-8")))
+      if activity_unit_test_file_content:
+        # Agrego archivo de test unitario
+        unit_test_info = tarfile.TarInfo(name="unit_test." + getUnitTestExtension(activity_language))
+        unit_test_info.size = len(activity_unit_test_file_content)
+        tar.addfile(tarinfo=unit_test_info, fileobj=io.BytesIO(activity_unit_test_file_content.encode("utf-8")))
 
       
       if activity_io_tests:
