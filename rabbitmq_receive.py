@@ -18,10 +18,9 @@ def callback(ch, method, properties, body):
 
     try:
         receiver.ejecutar(subm, lang)
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
     except:
         pass
-
 
 
 channel.basic_qos(prefetch_count=1)

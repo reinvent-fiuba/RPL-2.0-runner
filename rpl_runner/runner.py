@@ -1,28 +1,28 @@
-import shutil
 import subprocess
 import sys
-import io
 from pathlib import Path
 
+
 class RunnerError(Exception):
-  def __init__(self, stage, message):
+    def __init__(self, stage, message):
         super().__init__(message)
         self.stage = stage
         self.message = message
 
+
 class Runner:
-    '''
+    """
     Base clase with the necessary steps to prepare, build and run an assignment
     either with unit tests or IO tests.
-    '''
-    
+    """
+
     BUILD_TIMEOUT = 20
     RUN_TIMEOUT = 60
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
-        '''
+        """
         Receives a path where all the files are and the test_type (I/O or unit)
-        '''
+        """
         self.path = path
         self.test_type = test_type
         self.stage = "PREPARING"
@@ -30,31 +30,29 @@ class Runner:
         self.stderr = stderr
         self.logger = get_logger(stdout)
 
-
     def process(self):
-        '''
+        """
         Only public function. Does all the work.
         - generate_files must be implemented by a custom runner extending this class.
         - Build depends onthe custom runner's generated Makefile and executes 'make -k build'
         - Run command just executes 'make -k run' and pipes the input files in case it IO tested
-        '''
+        """
         self.generate_files()
         self.build()
         return self.run()
 
-
     def exec_cmd(self, cmd, timeout):
-        '''
+        """
         Executes a single command and logs the output.
         Receives the command name (just for logging) and the actual subprocess.Popen instance
         Everything between 'start_*' and 'end_*' is what the student will see as output.
-        '''
+        """
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
         self.logger.info(f"start_{self.stage}")
         try:
             output, _ = cmd_cmd.communicate(timeout)
-            
+
         except subprocess.TimeoutExpired:
             cmd_cmd.kill()
             msg = f"{self.stage} error\n  TIMEOUT {timeout}"
@@ -63,24 +61,22 @@ class Runner:
         output = output.decode("utf-8", "replace").rstrip()
         self.log(output)
         self.logger.info(f"end_{self.stage}")
-        
+
         return output
 
-
     def exec_cmds(self, cmds, timeout):
-        '''Lo mismo que la de arriba pero muchos comandos'''
+        """Lo mismo que la de arriba pero muchos comandos"""
         results = []
         for cmd in cmds:
             results.append(self.exec_cmd(cmd, timeout))
         return results
 
-
     def build(self):
-        '''
+        """
         Build process.
         If build fails raises RunnerError.
         Heavily depends on the generated Makefile in the generate_files step.
-        '''
+        """
         self.stage = "BUILD"
         self.logger.info("Build Started")
         build_cmd = self.build_cmd()
@@ -93,13 +89,12 @@ class Runner:
 
         self.logger.info("Build Ended")
 
-
     def run(self):
-        '''
+        """
         Run process.
         If returncode is not 0, raises RunnerError.
         Heavily depends on the generated Makefile in the generate_files step.
-        '''
+        """
         self.logger.info("Run Started")
 
         self.stage = "RUN"
@@ -111,33 +106,29 @@ class Runner:
                 self.logger.info("RUN ERROR")
                 raise RunnerError(self.stage, f"Error en {cmd_name}. Codigo Error {cmd_cmd.returncode}")
         self.logger.info("RUN OK")
-            
 
         self.logger.info("Run Ended")
         return 0
 
-
     def generate_files(self):
-        '''
+        """
         Step aimed to prepare the environment for the assignment to be successfuly run, this includes:
             - Adding a custom Makefile  <----- IMPORTANT ----->
             - Any extra files the activity needs
-        '''
+        """
         raise NotImplementedError()
 
-
     def build_cmd(self):
-        return ("Building", subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL, 
-                stdout=subprocess.PIPE, stderr=self.stderr))
+        return ("Building", subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL,
+                                             stdout=subprocess.PIPE, stderr=self.stderr))
         # return ("Building", subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"], cwd=self.path, stdin=subprocess.DEVNULL, 
-                # stdout=subprocess.PIPE, stderr=self.stderr))
-
+        # stdout=subprocess.PIPE, stderr=self.stderr))
 
     def run_cmd(self):
-        '''
+        """
         Returns a list of tuples with the structure (<process_name>, <subprocess.Popen instante>)
         If it's an IO test, there will probably be multiple test scenarios therefore many runs.
-        '''
+        """
         # cmd_cmd = subprocess.Popen(["ls", "-la"], cwd=self.path, stdin=subprocess.DEVNULL,
         #                     stdout=subprocess.PIPE, stderr=self.stderr)
 
@@ -145,8 +136,6 @@ class Runner:
 
         # output = output.decode("utf-8", "replace").rstrip()
         # self.log(output)
-
-
 
         runs = []
         if self.test_type == "IO":
@@ -157,12 +146,15 @@ class Runner:
                 raise Exception("NO HAY INPUT FILES")
 
             for input_file in sorted(io_input_files):
-                f = open(input_file.resolve().as_posix(), "r")  # We don't care about resourses of a disposable docker container
-                runs.append((f"IO TEST: {input_file.name}", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=f,
-                            stdout=subprocess.PIPE, stderr=self.stderr)))
+                f = open(input_file.resolve().as_posix(),
+                         "r")  # We don't care about resourses of a disposable docker container
+                runs.append(
+                    (f"IO TEST: {input_file.name}", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=f,
+                                                                     stdout=subprocess.PIPE, stderr=self.stderr)))
         else:
-            return [("Running Unit Tests", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
-                        stdout=subprocess.PIPE, stderr=self.stderr))]
+            return [
+                ("Running Unit Tests", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
+                                                        stdout=subprocess.PIPE, stderr=self.stderr))]
         return runs
 
     def my_print(self, m):
@@ -188,7 +180,7 @@ def get_logger(stdout):
     logger = logging.getLogger('RPL-2.0')
     handler = logging.StreamHandler(stdout)
     formatter = logging.Formatter(
-            '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)

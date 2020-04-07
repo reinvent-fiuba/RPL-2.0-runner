@@ -1,10 +1,8 @@
-import tempfile
-import subprocess
-import tarfile
-import sys
-import shutil
 import json
-import io
+import subprocess
+import sys
+import tarfile
+import tempfile
 
 from custom_runner import CRunner, PythonRunner
 from runner import RunnerError
@@ -20,24 +18,24 @@ def parse_args():
 
     return parser.parse_args()
 
+
 def main():
-    '''
+    """
     Punto de entrada del runner, el proceso corriendo dentro de un
     contenedor docker para correr los scripts de los alumnes
-    '''
+    """
     args = parse_args()
     lang = args.lang
 
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
-    # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
-    # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
-    # seekable.
+        # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
+        # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
+        # seekable.
 
         # Todavia no descubro como evitar tener que escribir y luego leer...
         # Por ahora es un buen workarround
         with open("assignment.tar.gx", "wb") as assignment:
             assignment.write(sys.stdin.buffer.read())
-
 
         with tarfile.open("assignment.tar.gx") as tar:
             tar.extractall(tmpdir)
@@ -57,14 +55,13 @@ def main():
                 else:
                     mode = "IO"
 
-
                 unit_test_runner = custom_runners[lang](tmpdir, mode, my_stdout, my_stderr)
 
                 result = {}
                 try:
                     # Comenzamos la corrida
                     # io_runner.process()
-                    unit_test_runner.process() # writes stuff to my_stdout and my_stderr
+                    unit_test_runner.process()  # writes stuff to my_stdout and my_stderr
                     result["test_run_result"] = "OK"
                     result["test_run_stage"] = "COMPLETE"
                     result["test_run_exit_message"] = "Completed all stages"
@@ -82,14 +79,14 @@ def main():
                 result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
 
                 # Escribimos en el stdout del proceso por única vez
-                print(json.dumps(result, indent=4)) # Contenido que recibe el proceso que ejecuta el contenedor docker
+                print(json.dumps(result, indent=4))  # Contenido que recibe el proceso que ejecuta el contenedor docker
 
 
 def parse_stdout(log_stdout):
-    '''
+    """
     Devuelve una lista de todas las salidas de las corridas SIN EL LOGGING.
     Se identifica como salida del programa a todo el stdout entre el log start_RUN y end_RUN
-    '''
+    """
     results = []
     result = ""
     for line in log_stdout.split('\n'):
@@ -114,10 +111,10 @@ def pwd(dir):
     pwd = subprocess.run(["pwd"], cwd=dir, capture_output=True, text=True)
     print(pwd.stdout, file=sys.stderr)
 
+
 def ls(dir):
     ls = subprocess.run(["ls", "-l"], cwd=dir, capture_output=True, text=True)
     print(ls.stdout, file=sys.stderr)
-
 
 
 main()
