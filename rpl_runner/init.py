@@ -13,8 +13,9 @@ custom_runners = {"c_std11": CRunner, "python_3.7": PythonRunner}
 def parse_args():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(prog="RPL Submission Runner")
     parser.add_argument('--lang', help='Language of the assignment')
+    parser.add_argument('--test-mode', help='Type of test ("IO" or "unit_test")', dest='mode')
 
     return parser.parse_args()
 
@@ -26,6 +27,7 @@ def main():
     """
     args = parse_args()
     lang = args.lang
+    test_mode = args.mode
 
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
         # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
@@ -48,14 +50,14 @@ def main():
                 # Obtenemos el runner del lenguaje seleccionado
                 # io_runner = custom_runners[lang](tmpdir, "IO", my_stdout, my_stderr)
 
-                ls = subprocess.run(["ls", "-l"], cwd=tmpdir, capture_output=True, text=True)
-                ls_output = ls.stdout
-                if "unit_test" in ls_output:
-                    mode = "unit_test"
-                else:
-                    mode = "IO"
+                # ls = subprocess.run(["ls", "-l"], cwd=tmpdir, capture_output=True, text=True)
+                # ls_output = ls.stdout
+                # if "unit_test" in ls_output:
+                #     mode = "unit_test"
+                # else:
+                #     mode = "IO"
 
-                unit_test_runner = custom_runners[lang](tmpdir, mode, my_stdout, my_stderr)
+                unit_test_runner = custom_runners[lang](tmpdir, test_mode, my_stdout, my_stderr)
 
                 result = {}
                 try:
@@ -71,6 +73,15 @@ def main():
                     result["test_run_exit_message"] = e.message
 
                     # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
+
+                # Get criterion unit tests results
+                if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
+                    cat = subprocess.run(["cat", "criterion_output.json"], cwd=tmpdir, capture_output=True,
+                                         text=True)
+                    cat_result = cat.stdout
+                    result["test_run_unit_test_result"] = json.loads(cat_result)
+                else:
+                    result["test_run_unit_test_result"] = None
 
                 my_stdout.seek(0)
                 my_stderr.seek(0)
