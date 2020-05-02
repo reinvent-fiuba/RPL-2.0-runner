@@ -12,6 +12,6 @@ build: $(ARCHIVOS:.c=.o)
 	$(CC) -o main $^
 
 run:
-	./main
+	./main --custom-json
 
 .PHONY: main clean
