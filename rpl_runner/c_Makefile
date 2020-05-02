@@ -12,6 +12,6 @@ build: $(ARCHIVOS:.c=.o)
 	$(CC) -o main $^
 
 run:
-	./main --custom-json=criterion_output.json --quiet
+	./main --custom-json=criterion_output.json --quiet --always-succeed
 
 .PHONY: main clean
