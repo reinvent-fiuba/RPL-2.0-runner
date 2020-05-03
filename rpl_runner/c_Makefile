@@ -14,4 +14,7 @@ build: $(ARCHIVOS:.c=.o)
 run:
 	./main
 
+unit_test:
+	./main --json=unit_test_results_output.json --quiet --always-succeed
+
 .PHONY: main clean
