@@ -68,8 +68,8 @@ def main():
                 if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
                     cat = subprocess.run(["cat", "criterion_output.json"], cwd=tmpdir, capture_output=True,
                                          text=True)
-                    cat_result = cat.stdout
-                    result["test_run_unit_test_result"] = json.loads(cat_result)
+                    unit_test_resutls = get_custom_unit_test_results_json(json.loads(cat.stdout))
+                    result["test_run_unit_test_result"] = unit_test_resutls
                 else:
                     result["test_run_unit_test_result"] = None
 
@@ -104,6 +104,21 @@ def parse_stdout(log_stdout):
             result += line
 
     return results
+
+
+# Check out util_files/salida_criterion.json to see raw format
+def get_custom_unit_test_results_json(criterion_json):
+    result = {}
+    if criterion_json["test_suites"] and len(criterion_json["test_suites"]) > 0:
+        result["passed"] = criterion_json["passed"]
+        result["failed"] = criterion_json["failed"]
+        result["errored"] = criterion_json["errored"]
+        result["tests"] = criterion_json["test_suites"][0]["tests"]
+
+    for i in range(len(result["tests"])):
+        if result["tests"][i]["status"] == "FAILED":
+            result["tests"][i]["messages"] = "\n".join(result["tests"][i]["messages"])
+    return result
 
 
 # Funciones para probar

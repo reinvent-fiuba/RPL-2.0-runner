@@ -10,11 +10,11 @@ RUN apt-get update     && \
 ADD runner-libs/ /runner-libs/
 
 # Copy libcriterion files
-RUN tar -zxvf /runner-libs/c/criterion-v2.3.0-rc2-custom.tar.gz -C /runner-libs/c/
-RUN cp -r /runner-libs/c/criterion-v2.3.0-rc2/. /usr
+#RUN tar -zxvf /runner-libs/c/criterion-v2.3.0-rc2-custom.tar.gz -C /runner-libs/c/
+#RUN cp -r /runner-libs/c/criterion-v2.3.0-rc2/. /usr
 
-#RUN tar -zxvf /runner-libs/c/criterion_ale.tar.gz -C /runner-libs/c/
-#RUN cp -r /runner-libs/c/. /usr
+RUN tar -zxvf /runner-libs/c/criterion_ale.tar.gz -C /runner-libs/c/
+RUN cp -r /runner-libs/c/. /usr
 
 COPY ["*.py", "*_Makefile", "/"]
 

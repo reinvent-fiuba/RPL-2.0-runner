@@ -20,7 +20,7 @@ class CRunner(Runner):
         else:
             # First we check that the student files compile,
             # otherwise the error message will be mixed with criterion files
-            build_only_sudent_files = subprocess.Popen(["gcc", "-c", "main.c", "-o", "aux_file", "-Wall", "-lm"],
+            build_only_sudent_files = subprocess.Popen(["gcc", "-c", "main.c", "-o", "aux_file", "-lm"],
                                                        cwd=self.path,
                                                        stdin=subprocess.DEVNULL,
                                                        stdout=subprocess.PIPE,
