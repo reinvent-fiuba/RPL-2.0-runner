@@ -39,6 +39,7 @@ class CRunner(Runner):
                                      stdin=subprocess.DEVNULL,
                                      stdout=subprocess.PIPE,
                                      stderr=self.stderr))
+            # TODO: Luego de compilar, borrar todos los ".c" para que no hagan print de las pruebas
 
 
 class PythonRunner(Runner):

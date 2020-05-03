@@ -2,8 +2,11 @@ import json
 import os
 import unittest
 
-import unit_test
+import unit_test  # module implemented by the teacher with the activitie's unit tests
 
+
+# We implement our own TestResult class so that we can then present UnitTest results however we want
+# See available overridable methods here https://docs.python.org/3.4/library/unittest.html#unittest.TestResult
 
 class RplTestResult(unittest.TestResult):
 
@@ -13,32 +16,7 @@ class RplTestResult(unittest.TestResult):
 
     def addSuccess(self, test):
         self.passed.append(test)
-        # self.testResults.append(
-        #   {"name": test._testMethodName, "success": True, "description": "passed"})
         super().addSuccess(test)
-
-    # def addError(self, test, err):
-    #     self.testResults.append(
-    #         {"name": test._testMethodName, "success": False, "description": str(err)})
-    #     super(RplTestResult, self).addError(test, err)
-    #
-    # def addFailure(self, test, err):
-    #     print({"name": test._testMethodName, "success": False,
-    #                              "description": f"failure: {str(err.)}"})
-    #     super().addFailure(test, err)
-    #
-    # def addSkip(self, test, reason):
-    #     self.testResults.append({"name": test._testMethodName, "success": False,
-    #                              "description": f"skipped: {str(reason)}"})
-    #     super(RplTestResult, self).addSkip(test, reason)
-    #
-    # def addExpectedFailure(self, test, err):
-    #     self.testResults.append(
-    #         {"name": test._testMethodName, "success": False, "description": str(err)})
-    #     super(RplTestResult, self).addExpectedFailure(test, err)
-    #
-    # def startTestRun(self):
-    #     super(RplTestResult, self).startTestRun()
 
     def stopTestRun(self):
         tests = [{"name": test._testMethodName, "status": "PASSED", "messages": None} for test in self.passed]
