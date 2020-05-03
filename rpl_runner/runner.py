@@ -153,7 +153,7 @@ class Runner:
                                                                      stdout=subprocess.PIPE, stderr=self.stderr)))
         else:
             return [
-                ("Running Unit Tests", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
+                ("Running Unit Tests", subprocess.Popen(["make", "-k", "unit_test"], cwd=self.path, stdin=subprocess.DEVNULL,
                                                         stdout=subprocess.PIPE, stderr=self.stderr))]
         return runs
 

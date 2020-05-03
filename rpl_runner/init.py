@@ -66,12 +66,9 @@ def main():
 
                 # Get criterion unit tests results
                 if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
-                    cat = subprocess.run(["cat", "criterion_output.json"], cwd=tmpdir, capture_output=True,
-                                         text=True)
-                    unit_test_resutls = get_custom_unit_test_results_json(json.loads(cat.stdout))
-                    result["test_run_unit_test_result"] = unit_test_resutls
+                    result["test_run_unit_test_result"] = get_unit_test_results(tmpdir, lang)
                 else:
-                    result["test_run_unit_test_result"] = None
+                    result["test_run_unit_test_result"] = None  # Nice To have for debbuging
 
                 my_stdout.seek(0)
                 my_stderr.seek(0)
@@ -104,6 +101,13 @@ def parse_stdout(log_stdout):
             result += line
 
     return results
+
+
+def get_unit_test_results(tmpdir, lang):
+    cat = subprocess.run(["cat", "unit_test_results_output.json"], cwd=tmpdir, capture_output=True, text=True)
+    if lang == "c_std11":
+        return get_custom_unit_test_results_json(json.loads(cat.stdout))
+    return json.loads(cat.stdout)
 
 
 # Check out util_files/salida_criterion.json to see raw format

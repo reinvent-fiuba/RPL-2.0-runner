@@ -12,6 +12,9 @@ build: $(ARCHIVOS:.c=.o)
 	$(CC) -o main $^
 
 run:
-	./main --json=criterion_output.json --quiet --always-succeed
+	./main
+
+unit_test:
+	./main --json=unit_test_results_output.json --quiet --always-succeed
 
 .PHONY: main clean

@@ -15,6 +15,7 @@ ADD runner-libs/ /runner-libs/
 
 RUN tar -zxvf /runner-libs/c/criterion_ale.tar.gz -C /runner-libs/c/
 RUN cp -r /runner-libs/c/. /usr
+RUN cp /runner-libs/python/unit_test_wrapper.py /usr
 
 COPY ["*.py", "*_Makefile", "/"]
 

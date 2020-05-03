@@ -48,3 +48,5 @@ class PythonRunner(Runner):
 
     def generate_files(self):
         shutil.copy("/python_Makefile", self.path + "/Makefile")
+        if self.test_type != "IO":
+            shutil.copy("/usr/unit_test_wrapper.py", self.path + "/unit_test_wrapper.py")
