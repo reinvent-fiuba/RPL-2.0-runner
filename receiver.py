@@ -50,8 +50,8 @@ def ejecutar(submission_id, lang='c_std11'):
         submission_file_id = submission['submission_file_id']
         submission_file_name = submission['submission_file_name']
 
-        activity_supporting_file_id = submission['activity_supporting_file_id']
-        activity_supporting_file_name = submission['activity_supporting_file_name']
+        activity_starting_files_id = submission['activity_starting_files_id']
+        activity_starting_files_name = submission['activity_starting_files_name']
 
         activity_unit_test_file_content = submission['activity_unit_tests_content']  # string with unit_test content
         activity_io_tests = submission['activity_iotests']  # Array of strings (input part of IO tests)
@@ -80,11 +80,11 @@ def ejecutar(submission_id, lang='c_std11'):
 
         # ---------------------------------------------------------
 
-        print(f"Obteniendo activity files {activity_supporting_file_id}....")
+        print(f"Obteniendo activity files {activity_starting_files_id}....")
 
-        if activity_supporting_file_id:
+        if activity_starting_files_id:
             # GET ACTIVITY FILES
-            activity_file_response = requests.get(f"http://localhost:8080/api/files/{activity_supporting_file_id}")
+            activity_file_response = requests.get(f"http://localhost:8080/api/files/{activity_starting_files_id}")
 
             with open(tmpdir + "/activity_files.tar.gz", 'wb') as af:
                 af.write(activity_file_response.content)
@@ -119,19 +119,19 @@ def ejecutar(submission_id, lang='c_std11'):
             tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
 
             print("Agrego archivos de la submission")
-            # Agrego archivos de la submission
+            # Agrego archivos de la submission (incluyen los archivos de la activity por ahora)
             with tarfile.open(tmpdir + '/submission_files.tar.gz') as submission_tar:
                 for member_tarinfo in submission_tar.getmembers():
                     member_fileobj = submission_tar.extractfile(member_tarinfo)
                     tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
 
             # Agrego archivos de la activity
-            if activity_supporting_file_id:
-                print("Agrego archivos de la activity")
-                with tarfile.open(tmpdir + '/activity_files.tar.gz') as activiy_files_tar:
-                    for member_tarinfo in activiy_files_tar.getmembers():
-                        member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
-                        tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
+            # if activity_starting_files_id:
+            #     print("Agrego archivos de la activity")
+            #     with tarfile.open(tmpdir + '/activity_files.tar.gz') as activiy_files_tar:
+            #         for member_tarinfo in activiy_files_tar.getmembers():
+            #             member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
+            #             tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
 
             if activity_unit_test_file_content:
                 # Agrego archivo de test unitario
