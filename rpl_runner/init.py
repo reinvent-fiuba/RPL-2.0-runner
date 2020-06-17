@@ -63,6 +63,10 @@ def main():
                     result["test_run_exit_message"] = e.message
 
                     # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
+                except Exception as e:
+                    result["test_run_result"] = "UNKNOWN_ERROR"
+                    result["test_run_stage"] = "unknown"
+                    result["test_run_exit_message"] = str(e)
 
                 # Get criterion unit tests results
                 if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":

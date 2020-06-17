@@ -129,21 +129,15 @@ class Runner:
         Returns a list of tuples with the structure (<process_name>, <subprocess.Popen instante>)
         If it's an IO test, there will probably be multiple test scenarios therefore many runs.
         """
-        # cmd_cmd = subprocess.Popen(["ls", "-la"], cwd=self.path, stdin=subprocess.DEVNULL,
-        #                     stdout=subprocess.PIPE, stderr=self.stderr)
-
-        # output, _ = cmd_cmd.communicate()
-
-        # output = output.decode("utf-8", "replace").rstrip()
-        # self.log(output)
-
         runs = []
         if self.test_type == "IO":
             cwd = Path(self.path)
             io_input_files = list(cwd.glob('IO_test_*'))
 
             if len(io_input_files) == 0:
-                raise Exception("NO HAY INPUT FILES")
+                return [
+                    (f"SIN UNIT TEST", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
+                                                        stdout=subprocess.PIPE, stderr=self.stderr))]
 
             for input_file in sorted(io_input_files):
                 f = open(input_file.resolve().as_posix(),
@@ -152,9 +146,9 @@ class Runner:
                     (f"IO TEST: {input_file.name}", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=f,
                                                                      stdout=subprocess.PIPE, stderr=self.stderr)))
         else:
-            return [
-                ("Running Unit Tests", subprocess.Popen(["make", "-k", "unit_test"], cwd=self.path, stdin=subprocess.DEVNULL,
-                                                        stdout=subprocess.PIPE, stderr=self.stderr))]
+            return [("Running Unit Tests",
+                     subprocess.Popen(["make", "-k", "run_unit_test"], cwd=self.path, stdin=subprocess.DEVNULL,
+                                      stdout=subprocess.PIPE, stderr=self.stderr))]
         return runs
 
     def my_print(self, m):

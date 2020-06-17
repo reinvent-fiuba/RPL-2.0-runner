@@ -19,7 +19,9 @@ def callback(ch, method, properties, body):
     try:
         receiver.ejecutar(subm, lang)
         ch.basic_ack(delivery_tag=method.delivery_tag)
-    except:
+    except Exception as e:
+        print("receiver tiro una exception!!!!", str(e))
+        ch.basic_ack(delivery_tag=method.delivery_tag)  # TODO: ver como avisar que se proceso pero con error y que la quiero procesar devuelta
         pass
 
 

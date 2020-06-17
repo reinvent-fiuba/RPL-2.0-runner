@@ -20,10 +20,10 @@ class CRunner(Runner):
         else:
             # First we check that the student files compile,
             # otherwise the error message will be mixed with criterion files
-            build_only_sudent_files = subprocess.Popen(["gcc", "-c", "main.c", "-o", "aux_file", "-lm"],
+            build_only_sudent_files = subprocess.Popen(["make", "-k", "build_pre_unit_test"],
                                                        cwd=self.path,
                                                        stdin=subprocess.DEVNULL,
-                                                       stdout=subprocess.PIPE,
+                                                       stdout=self.stdout,
                                                        stderr=self.stderr)
 
             output, _ = build_only_sudent_files.communicate()
@@ -34,7 +34,7 @@ class CRunner(Runner):
                                   f"Error de compilación. Codigo Error {build_only_sudent_files.returncode}")
 
             return ("Building",
-                    subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"],
+                    subprocess.Popen(["make", "-k", "build_unit_test"],
                                      cwd=self.path,
                                      stdin=subprocess.DEVNULL,
                                      stdout=subprocess.PIPE,
