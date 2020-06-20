@@ -58,6 +58,8 @@ def ejecutar(submission_id, lang='c_std11'):
 
         activity_language = submission['activity_language']
 
+        activity_compilation_flags = submission['compilation_flags']
+
         is_io_tested = submission['is_iotested']
 
         test_mode = "IO" if is_io_tested else "unit_test"
@@ -110,7 +112,10 @@ def ejecutar(submission_id, lang='c_std11'):
         # --rm --> clean up container after run
         #
         with subprocess.Popen(
-                ["docker", "run", "--rm", "--interactive", "--env", "LANG=C.UTF-8", "rpl-2.0-runner", "--lang", lang,
+                ["docker", "run", "--rm", "--interactive", 
+                "--env", "LANG=C.UTF-8", 
+                "--env", "CFLAGS=" + activity_compilation_flags, 
+                "rpl-2.0-runner", "--lang", lang,
                  "--test-mode", test_mode],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
