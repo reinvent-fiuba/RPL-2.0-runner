@@ -112,9 +112,9 @@ def ejecutar(submission_id, lang='c_std11'):
         # --rm --> clean up container after run
         #
         with subprocess.Popen(
-                ["docker", "run", "--rm", "--interactive", 
-                "--env", "LANG=C.UTF-8", 
-                "--env", "CFLAGS=" + activity_compilation_flags, 
+                ["docker", "run", "--rm", "--interactive",
+                "--env", "LANG=C.UTF-8",
+                "--env", "CFLAGS=" + activity_compilation_flags,
                 "rpl-2.0-runner", "--lang", lang,
                  "--test-mode", test_mode],
                 stdin=subprocess.PIPE,
