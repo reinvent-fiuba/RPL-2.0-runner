@@ -90,7 +90,7 @@ Post a submission like  (replace `/home/alepox/Desktop/tp_prof/rpl/pruebita_runn
 
 ```sh
 curl -X POST \
-  http://localhost:8080/api/courses/1/activities/1/submissions \
+  {producer_base_api}/api/courses/1/activities/1/submissions \
   -H 'Accept: */*' \
   -H 'Accept-Encoding: gzip, deflate' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTc4MTM5MjA0LCJleHAiOjE1NzgxNTM2MDR9.nSub-DaZq5bejmN_h31gymg4xay--mbSD0_ogpGOsDJzV1pP_gkSwCF_LnwfSm0UsLFYuuoCHruC2V8hCaaIqA' \

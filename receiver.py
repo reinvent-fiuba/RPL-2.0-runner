@@ -7,6 +7,9 @@ import tempfile
 
 import requests
 
+# producer_base_api = "http://localhost:8080"
+producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
+
 
 def main():
     ejecutar(int(sys.argv[1]) if len(sys.argv) > 1 else 1, sys.argv[2] if len(sys.argv) > 2 else 'c_std11')
@@ -33,7 +36,7 @@ def ejecutar(submission_id, lang='c_std11'):
 
         print(f"Obteniendo submission data {submission_id}....")
         # GET SUBMISSION
-        response = requests.get(f"http://localhost:8080/api/submissions/{submission_id}")
+        response = requests.get(f"{producer_base_api}/api/submissions/{submission_id}")
 
         print(json.dumps(response.json(), indent=4))
 
@@ -72,7 +75,7 @@ def ejecutar(submission_id, lang='c_std11'):
 
         print(f"Obteniendo submission files {submission_file_id}....")
         # GET SUBMISSION FILES
-        submission_file_response = requests.get(f"http://localhost:8080/api/files/{submission_file_id}")
+        submission_file_response = requests.get(f"{producer_base_api}/api/files/{submission_file_id}")
 
         if submission_file_response.status_code != 200:
             raise Exception("Error al obtener el comprimido de submission")
@@ -86,7 +89,7 @@ def ejecutar(submission_id, lang='c_std11'):
 
         if activity_starting_files_id:
             # GET ACTIVITY FILES
-            activity_file_response = requests.get(f"http://localhost:8080/api/files/{activity_starting_files_id}")
+            activity_file_response = requests.get(f"{producer_base_api}/api/files/{activity_starting_files_id}")
 
             with open(tmpdir + "/activity_files.tar.gz", 'wb') as af:
                 af.write(activity_file_response.content)
@@ -98,7 +101,7 @@ def ejecutar(submission_id, lang='c_std11'):
         print(f"Submission obtenida: {solution_tar}")
 
         print("Actualizando submission: PROCESSING")
-        response = requests.put(f"http://localhost:8080/api/submissions/{submission_id}", json={"status": "PROCESSING"})
+        response = requests.put(f"{producer_base_api}/api/submissions/{submission_id}/status", json={"status": "PROCESSING"})
         if response.status_code != 200:
             raise Exception(f"Error al actualizar el estado de la submission: {response.json()}")
 
@@ -177,7 +180,7 @@ def ejecutar(submission_id, lang='c_std11'):
             print(f"Código de retorno de ejecución: {retcode}")
 
             # mandar resultado (json_output/result) POST al backend
-            response = requests.post(f"http://localhost:8080/api/submissions/{submission_id}/result", json=result)
+            response = requests.post(f"{producer_base_api}/api/submissions/{submission_id}/result", json=result)
             if response.status_code != 201:
                 raise Exception(f"Error al postear el resultado de la submission: {response.json()}")
 

@@ -6,7 +6,7 @@ submission_file_id = 8
 def getCompressedFile():
     print(f"Obteniendo submission files {submission_file_id}....")
     # GET SUBMISSION FILES
-    submission_file_response = requests.get(f"http://localhost:8080/api/files/{submission_file_id}")
+    submission_file_response = requests.get(f"{producer_base_api}/api/files/{submission_file_id}")
 
     if submission_file_response.status_code != 200:
         raise Exception("Error al obtener el comprimido de submission")
@@ -18,7 +18,7 @@ def getCompressedFile():
 def getExtractedFile():
     print(f"Obteniendo submission files {submission_file_id}....")
     # GET SUBMISSION FILES
-    submission_file_response = requests.get(f"http://localhost:8080/api/getExtractedFile/{submission_file_id}")
+    submission_file_response = requests.get(f"{producer_base_api}/api/getExtractedFile/{submission_file_id}")
 
     if submission_file_response.status_code != 200:
         raise Exception("noooo")
