@@ -4,7 +4,6 @@ VALGRIND = valgrind --leak-check=full --track-origins=yes --show-reachable=yes -
 
 ARCHIVOS = $(wildcard *.c)
 ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.c, $(ARCHIVOS))
-ARCHIVOS_SIN_MAIN := $(filter-out main.c, $(ARCHIVOS))
 
 build: $(ARCHIVOS:.c=.o)
 	$(CC) ${CFLAGS} -o main $^
@@ -16,7 +15,7 @@ build_pre_unit_test: $(ARCHIVOS_SIN_UNIT_TEST)
 	$(CC) -c $^
 
 
-build_unit_test: $(ARCHIVOS_SIN_MAIN:.c=.o)
+build_unit_test: $(ARCHIVOS:.c=.o)
 	$(CC) -o main $^ -lcriterion
 
 run_unit_test:

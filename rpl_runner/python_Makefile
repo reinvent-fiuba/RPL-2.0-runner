@@ -8,5 +8,5 @@ run:
 	/usr/bin/python3.7 assignment_main.py
 
 
-unit_test:
+run_unit_test:
 	/usr/bin/python3.7 unit_test_wrapper.py
