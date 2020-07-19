@@ -124,7 +124,7 @@ def get_custom_unit_test_results_json(criterion_json):
         result["tests"] = criterion_json["test_suites"][0]["tests"]
 
     for i in range(len(result["tests"])):
-        if result["tests"][i]["status"] == "FAILED":
+        if result["tests"][i]["status"] in ["FAILED", "ERRORED"]:
             result["tests"][i]["messages"] = "\n".join(result["tests"][i]["messages"])
     return result
 

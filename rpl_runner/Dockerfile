@@ -4,8 +4,9 @@ RUN apt-get update     && \
     apt-get upgrade -y && \
     apt-get install -y gcc gcc-multilib g++ clang      	\
                        make valgrind time python3.7 	\
-                       libgtest-dev 
+                       libgtest-dev python3-pip
 
+RUN pip3 install pyinstaller
 # Add runner
 ADD runner-libs/ /runner-libs/
 

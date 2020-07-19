@@ -1,12 +1,23 @@
 ARCHIVOS = $(wildcard *.py)
 
-build: $(ARCHIVOS)
+# py_compile so that if it fails, fail fast and we get a nice error traceback
+# Then create binary and delete source files so students can't read and print test cases
+# @ --> don't print command to stdout
+build_io: $(ARCHIVOS)
 	/usr/bin/python3.7 -m py_compile  $^
+	@/usr/local/bin/pyinstaller -y --clean --log-level ERROR --distpath /tmp/dist --workpath /tmp/build assignment_main.py
+	@rm ${ARCHIVOS}
+	@rm -r /tmp/build
 
+build_unit_test: $(ARCHIVOS)
+	/usr/bin/python3.7 -m py_compile  $^
+	@/usr/local/bin/pyinstaller -y --clean --log-level ERROR --distpath /tmp/dist --workpath /tmp/build unit_test_wrapper.py
+	@rm ${ARCHIVOS}
+	@rm -r /tmp/build
 
 run:
-	/usr/bin/python3.7 assignment_main.py
+	@/tmp/dist/assignment_main/assignment_main
 
 
 run_unit_test:
-	/usr/bin/python3.7 unit_test_wrapper.py
+	@/tmp/dist/unit_test_wrapper/unit_test_wrapper

@@ -61,12 +61,28 @@ stdout result example:
 	
 ```json
 {
-    "result": "ERROR",
-    "stage": "BUILD",
-    "message": "Codigo Error 2",
-    "stdout": "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::BUILD OUTPUT::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\ngcc -g -O2 -std=c99 -Wall -Wformat=2 -Wshadow -Wpointer-arith -Wunreachable-code -Wconversion -Wno-sign-conversion -Wbad-function-cast -DCORRECTOR   -c -o test_file.o test_file.c\n<builtin>: recipe for target 'test_file.o' failed\n\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::END BUILD OUTPUT::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\nBUILD ERROR: error_code --> 2\n",
-    "stderr": "test_file.c: In function \u2018main\u2019:\ntest_file.c:15:5: error: expected \u2018;\u2019 before \u2018tiempo_ingresado\u2019\n     tiempo_ingresado = tiempo_ingresado % 3600;\n     ^~~~~~~~~~~~~~~~\ntest_file.c:17:11: warning: conversion to \u2018float\u2019 from \u2018int\u2019 may alter its value [-Wconversion]\n     seg = tiempo_ingresado % 60;\n           ^~~~~~~~~~~~~~~~\ntest_file.c:11:5: warning: ignoring return value of \u2018scanf\u2019, declared with attribute warn_unused_result [-Wunused-result]\n     scanf (\"%d\",&tiempo_ingresado);\n     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nmake: *** [test_file.o] Error 1\nmake: Target 'main' not remade because of errors.\n"
-}
+  "test_run_result":"OK",                                                                                                                                                                                    
+  "test_run_stage":"COMPLETE",
+  "test_run_exit_message": "Completed all stages",
+  "test_run_unit_test_result": {
+    "passed": 2,
+    "failed": 0,
+  "errored": 0,
+  "tests":[
+    {
+      "name": "test_1",
+      "status": "PASSED",
+      "messages": null
+    }
+    {
+      "name": "test_2",
+      "status": "PASSED",
+      "messages": null
+    }                                                                                                                                         
+  ],
+  "test_run_stdout": "2020-07-19 20:16:55,844 RPL-2.0      INFO     Build Started\n2020-07-19 20:16:55,845 RPL-2.0      INFO     Building\n2020-07-19 20:16:55,846 RPL-2.0      INFO     start_BUILD\n/usr/bin/python3.7 -m py_compile  unit_test.py unit_test_wrapper.py assignment_main.py\n2020-07-19 20:17:02,219 RPL-2.0      INFO     end_BUILD\n2020-07-19 20:17:02,219 RPL-2.0      INFO     Build Ended\n2020-07-19 20:17:02,219 RPL-2.0      INFO     Run Started\n2020-07-19 20:17:02,221 RPL-2.0      INFO     Running Unit Tests\n2020-07-19 20:17:02,221 RPL-2.0      INFO     start_RUN\n\n2020-07-19 20:17:02,287 RPL-2.0      INFO     end_RUN\n2020-07-19 20:17:02,288 RPL-2.0      INFO     RUN OK\n2020-07-19 20:17:02,288 RPL-2.0      INFO     Run Ended\n",
+  "test_run_stderr":"",
+} 
 ```
 
 
@@ -126,3 +142,16 @@ python3 rabbitmq_receive.py
 ```sh
 python3 rabbitmq_send.py <submission_id> <lang>
 ```
+
+# Compiling and deleting source files
+
+Check out `c_Makefile` and `python_Makefile`
+
+## C
+
+We are just compiling the code and deleting the source files before execution
+
+## python
+
+First we execute python -m py_compile so that, if it fails, we get a nice "user-only-code" error message
+We are using (pyinstaller)[https://pyinstaller.readthedocs.io/en/stable/usage.html] to generate a binary file and then executing it in the "run" step.

@@ -24,6 +24,14 @@
           "messages": [
             "unit_test.c:5: The expression fooNoRepetido() == 1 is false."
           ]
+        },
+        {
+          "name": "testName1",
+          "assertions": 1,
+          "status": "ERRORED",
+          "messages": [
+            "The test crashed"
+          ]
         }
       ]
     }

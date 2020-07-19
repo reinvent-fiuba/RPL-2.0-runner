@@ -69,7 +69,7 @@ def ejecutar(submission_id, lang='c_std11'):
 
         print(f"======TEST MODE: {test_mode} ===========")
 
-        print(activity_unit_test_file_content)
+        # print(activity_unit_test_file_content)
 
         # ---------------------------------------------------------
 
