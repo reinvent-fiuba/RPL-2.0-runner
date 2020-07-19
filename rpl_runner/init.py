@@ -14,8 +14,10 @@ def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser(prog="RPL Submission Runner")
-    parser.add_argument('--lang', help='Language of the assignment')
-    parser.add_argument('--test-mode', help='Type of test ("IO" or "unit_test")', dest='mode')
+    parser.add_argument("--lang", help="Language of the assignment")
+    parser.add_argument(
+        "--test-mode", help='Type of test ("IO" or "unit_test")', dest="mode"
+    )
 
     return parser.parse_args()
 
@@ -44,11 +46,16 @@ def main():
 
             # Escribimos los logs, stdout y stderr en archivos temporarios para despues poder devolverlo
             # y que el usuario vea que paso en su corrida
-            with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stdout, \
-                    tempfile.TemporaryFile(mode="w+", encoding="utf-8") as my_stderr:
+            with tempfile.TemporaryFile(
+                mode="w+", encoding="utf-8"
+            ) as my_stdout, tempfile.TemporaryFile(
+                mode="w+", encoding="utf-8"
+            ) as my_stderr:
 
                 # Obtenemos el runner del lenguaje y modo seleccionado
-                test_runner = custom_runners[lang](tmpdir, test_mode, my_stdout, my_stderr)
+                test_runner = custom_runners[lang](
+                    tmpdir, test_mode, my_stdout, my_stderr
+                )
 
                 result = {}
                 try:
@@ -70,9 +77,13 @@ def main():
 
                 # Get criterion unit tests results
                 if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
-                    result["test_run_unit_test_result"] = get_unit_test_results(tmpdir, lang)
+                    result["test_run_unit_test_result"] = get_unit_test_results(
+                        tmpdir, lang
+                    )
                 else:
-                    result["test_run_unit_test_result"] = None  # Nice To have for debbuging
+                    result[
+                        "test_run_unit_test_result"
+                    ] = None  # Nice To have for debbuging
 
                 my_stdout.seek(0)
                 my_stderr.seek(0)
@@ -81,7 +92,9 @@ def main():
                 result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
 
                 # Escribimos en el stdout del proceso por única vez
-                print(json.dumps(result, indent=4))  # Contenido que recibe el proceso que ejecuta el contenedor docker
+                print(
+                    json.dumps(result, indent=4)
+                )  # Contenido que recibe el proceso que ejecuta el contenedor docker
 
 
 def parse_stdout(log_stdout):
@@ -91,7 +104,7 @@ def parse_stdout(log_stdout):
     """
     results = []
     result = ""
-    for line in log_stdout.split('\n'):
+    for line in log_stdout.split("\n"):
         if "end_RUN" in line:
             results.append(result)
 
@@ -108,7 +121,12 @@ def parse_stdout(log_stdout):
 
 
 def get_unit_test_results(tmpdir, lang):
-    cat = subprocess.run(["cat", "unit_test_results_output.json"], cwd=tmpdir, capture_output=True, text=True)
+    cat = subprocess.run(
+        ["cat", "unit_test_results_output.json"],
+        cwd=tmpdir,
+        capture_output=True,
+        text=True,
+    )
     if lang == "c_std11":
         return get_custom_unit_test_results_json(json.loads(cat.stdout))
     return json.loads(cat.stdout)
@@ -130,6 +148,7 @@ def get_custom_unit_test_results_json(criterion_json):
 
 
 # Funciones para probar
+
 
 def pwd(dir):
     pwd = subprocess.run(["pwd"], cwd=dir, capture_output=True, text=True)

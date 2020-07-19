@@ -85,7 +85,9 @@ class Runner:
         cmd_name, cmd_cmd = build_cmd
         if cmd_cmd.returncode != 0:
             self.my_print(f"BUILD ERROR: error_code --> {cmd_cmd.returncode}")
-            raise RunnerError(self.stage, f"Error en {cmd_name}. Codigo Error {cmd_cmd.returncode}")
+            raise RunnerError(
+                self.stage, f"Error en {cmd_name}. Codigo Error {cmd_cmd.returncode}"
+            )
 
         self.logger.info("Build Ended")
 
@@ -104,7 +106,10 @@ class Runner:
         for cmd_name, cmd_cmd in run_cmds:
             if cmd_cmd.returncode != 0:
                 self.logger.info("RUN ERROR")
-                raise RunnerError(self.stage, f"Error en {cmd_name}. Codigo Error {cmd_cmd.returncode}")
+                raise RunnerError(
+                    self.stage,
+                    f"Error en {cmd_name}. Codigo Error {cmd_cmd.returncode}",
+                )
         self.logger.info("RUN OK")
 
         self.logger.info("Run Ended")
@@ -119,9 +124,17 @@ class Runner:
         raise NotImplementedError()
 
     def build_cmd(self):
-        return ("Building", subprocess.Popen(["make", "-k", "build"], cwd=self.path, stdin=subprocess.DEVNULL,
-                                             stdout=subprocess.PIPE, stderr=self.stderr))
-        # return ("Building", subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"], cwd=self.path, stdin=subprocess.DEVNULL, 
+        return (
+            "Building",
+            subprocess.Popen(
+                ["make", "-k", "build"],
+                cwd=self.path,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=self.stderr,
+            ),
+        )
+        # return ("Building", subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"], cwd=self.path, stdin=subprocess.DEVNULL,
         # stdout=subprocess.PIPE, stderr=self.stderr))
 
     def run_cmd(self):
@@ -132,35 +145,62 @@ class Runner:
         runs = []
         if self.test_type == "IO":
             cwd = Path(self.path)
-            io_input_files = list(cwd.glob('IO_test_*'))
+            io_input_files = list(cwd.glob("IO_test_*"))
 
             if len(io_input_files) == 0:
                 return [
-                    (f"SIN UNIT TEST", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=subprocess.DEVNULL,
-                                                        stdout=subprocess.PIPE, stderr=self.stderr))]
+                    (
+                        f"SIN UNIT TEST",
+                        subprocess.Popen(
+                            ["make", "-k", "run"],
+                            cwd=self.path,
+                            stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE,
+                            stderr=self.stderr,
+                        ),
+                    )
+                ]
 
             for input_file in sorted(io_input_files):
-                f = open(input_file.resolve().as_posix(),
-                         "r")  # We don't care about resourses of a disposable docker container
+                f = open(
+                    input_file.resolve().as_posix(), "r"
+                )  # We don't care about resourses of a disposable docker container
                 runs.append(
-                    (f"IO TEST: {input_file.name}", subprocess.Popen(["make", "-k", "run"], cwd=self.path, stdin=f,
-                                                                     stdout=subprocess.PIPE, stderr=self.stderr)))
+                    (
+                        f"IO TEST: {input_file.name}",
+                        subprocess.Popen(
+                            ["make", "-k", "run"],
+                            cwd=self.path,
+                            stdin=f,
+                            stdout=subprocess.PIPE,
+                            stderr=self.stderr,
+                        ),
+                    )
+                )
         else:
-            return [("Running Unit Tests",
-                     subprocess.Popen(["make", "-k", "run_unit_test"], cwd=self.path, stdin=subprocess.DEVNULL,
-                                      stdout=subprocess.PIPE, stderr=self.stderr))]
+            return [
+                (
+                    "Running Unit Tests",
+                    subprocess.Popen(
+                        ["make", "-k", "run_unit_test"],
+                        cwd=self.path,
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.PIPE,
+                        stderr=self.stderr,
+                    ),
+                )
+            ]
         return runs
 
     def my_print(self, m):
         print(m, file=self.stdout)
 
     def log_divider(self, message, fill, align, width):
-        self.my_print('{message:{fill}{align}{width}}'.format(
-            message=message,
-            fill=fill,
-            align=align,
-            width=width,
-        ))
+        self.my_print(
+            "{message:{fill}{align}{width}}".format(
+                message=message, fill=fill, align=align, width=width,
+            )
+        )
 
     def log(self, output):
         # self.log_divider(f"{self.stage} OUTPUT:", ":", '^', 150)
@@ -171,10 +211,9 @@ class Runner:
 def get_logger(stdout):
     import logging
 
-    logger = logging.getLogger('RPL-2.0')
+    logger = logging.getLogger("RPL-2.0")
     handler = logging.StreamHandler(stdout)
-    formatter = logging.Formatter(
-        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
