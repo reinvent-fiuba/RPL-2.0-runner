@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: runner
+spec:
+  ports:
+    - nodePort: 30024
+      protocol: TCP
+      port: 8088
+  selector:
+    app: runner
+    tier: backend
+  type: NodePort

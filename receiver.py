@@ -7,8 +7,9 @@ import tempfile
 
 import requests
 
+producer_base_api = "http://producer:8080"
 # producer_base_api = "http://localhost:8080"
-producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
+# producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
 
 
 def main():

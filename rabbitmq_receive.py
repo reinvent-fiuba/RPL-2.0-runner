@@ -25,8 +25,8 @@ def callback(ch, method, properties, body):
 
 def start_consuming():
     connection = pika.BlockingConnection(
-        # pika.ConnectionParameters(host='localhost'))
-        pika.URLParameters(url)
+        pika.ConnectionParameters(host='queue')
+        # pika.URLParameters(url)
     )
     channel = connection.channel()
 
@@ -42,10 +42,10 @@ def start_consuming():
 
 
 if __name__ == "__main__":
-    import systemd.daemon
+    # from systemd.daemon import notify, Notification
 
-    print("Starting up ...")
-    systemd.daemon.notify("READY=1")
-    print("Startup complete")
+    # print("Starting up ...")
+    # notify(Notification.READY)
+    # print("Startup complete")
 
     start_consuming()
