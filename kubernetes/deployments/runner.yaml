@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runner
+spec:
+  selector:
+    matchLabels:
+      app: runner
+      tier: backend
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: runner
+        tier: backend
+        track: stable
+    spec:
+      containers:
+      - name: worker
+        image: gcr.io/fiuba-rpl/rpl-2.0-worker:latest
+        volumeMounts:
+        - name: dockersock
+          mountPath: "/var/run/docker.sock"
+        securityContext:
+          privileged: true
+        env:
+        - name: QUEUE_SERVICE_HOST
+          value: queue
+        ports:
+          - name: http
+            containerPort: 8088
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock  
+      initContainers:
+      - name: runner
+        image: gcr.io/fiuba-rpl/rpl-2.0-runner:latest
+        command: [ "/bin/sh", "-c", "echo holaaaa"]
+      

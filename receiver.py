@@ -7,8 +7,9 @@ import tempfile
 
 import requests
 
+producer_base_api = "http://producer:8080"
 # producer_base_api = "http://localhost:8080"
-producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
+# producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
 
 
 def main():
@@ -142,7 +143,7 @@ def ejecutar(submission_id, lang="c_std11"):
                 "LANG=C.UTF-8",
                 "--env",
                 "CFLAGS=" + activity_compilation_flags,
-                "rpl-2.0-runner",
+                "gcr.io/fiuba-rpl/rpl-2.0-runner",
                 "--lang",
                 lang,
                 "--test-mode",
