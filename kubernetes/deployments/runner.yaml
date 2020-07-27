@@ -30,10 +30,12 @@ spec:
         ports:
           - name: http
             containerPort: 8088
-      - name: runner
-        image: gcr.io/fiuba-rpl/rpl-2.0-runner:latest
-        command: [ "/bin/sh", "-c", "echo helloooooo" ]
       volumes:
       - name: dockersock
         hostPath:
           path: /var/run/docker.sock  
+      initContainers:
+      - name: runner
+        image: gcr.io/fiuba-rpl/rpl-2.0-runner:latest
+        command: [ "/bin/sh", "-c", "echo holaaaa"]
+      
