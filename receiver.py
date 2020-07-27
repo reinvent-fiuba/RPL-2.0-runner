@@ -143,7 +143,7 @@ def ejecutar(submission_id, lang="c_std11"):
                 "LANG=C.UTF-8",
                 "--env",
                 "CFLAGS=" + activity_compilation_flags,
-                "rpl-2.0-runner",
+                "gcr.io/fiuba-rpl/rpl-2.0-runner",
                 "--lang",
                 lang,
                 "--test-mode",
