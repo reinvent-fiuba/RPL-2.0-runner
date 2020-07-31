@@ -7,9 +7,7 @@ import tempfile
 
 import requests
 
-producer_base_api = "http://producer:8080"
-# producer_base_api = "http://localhost:8080"
-# producer_base_api = "https://enigmatic-bayou-58033.herokuapp.com"
+from config import URL_RPL_BACKEND, DOCKER_RUNNER_IMAGE
 
 
 def main():
@@ -42,7 +40,7 @@ def ejecutar(submission_id, lang="c_std11"):
 
         print(f"Obteniendo submission data {submission_id}....")
         # GET SUBMISSION
-        response = requests.get(f"{producer_base_api}/api/submissions/{submission_id}")
+        response = requests.get(f"{URL_RPL_BACKEND}/api/submissions/{submission_id}")
 
         print(json.dumps(response.json(), indent=4))
 
@@ -86,7 +84,7 @@ def ejecutar(submission_id, lang="c_std11"):
         print(f"Obteniendo submission files {submission_file_id}....")
         # GET SUBMISSION FILES
         submission_file_response = requests.get(
-            f"{producer_base_api}/api/files/{submission_file_id}"
+            f"{URL_RPL_BACKEND}/api/files/{submission_file_id}"
         )
 
         if submission_file_response.status_code != 200:
@@ -102,7 +100,7 @@ def ejecutar(submission_id, lang="c_std11"):
         if activity_starting_files_id:
             # GET ACTIVITY FILES
             activity_file_response = requests.get(
-                f"{producer_base_api}/api/files/{activity_starting_files_id}"
+                f"{URL_RPL_BACKEND}/api/files/{activity_starting_files_id}"
             )
 
             with open(tmpdir + "/activity_files.tar.gz", "wb") as af:
@@ -116,7 +114,7 @@ def ejecutar(submission_id, lang="c_std11"):
 
         print("Actualizando submission: PROCESSING")
         response = requests.put(
-            f"{producer_base_api}/api/submissions/{submission_id}/status",
+            f"{URL_RPL_BACKEND}/api/submissions/{submission_id}/status",
             json={"status": "PROCESSING"},
         )
         if response.status_code != 200:
@@ -143,7 +141,7 @@ def ejecutar(submission_id, lang="c_std11"):
                 "LANG=C.UTF-8",
                 "--env",
                 "CFLAGS=" + activity_compilation_flags,
-                "gcr.io/fiuba-rpl/rpl-2.0-runner",
+                DOCKER_RUNNER_IMAGE,
                 "--lang",
                 lang,
                 "--test-mode",
@@ -162,14 +160,6 @@ def ejecutar(submission_id, lang="c_std11"):
                 for member_tarinfo in submission_tar.getmembers():
                     member_fileobj = submission_tar.extractfile(member_tarinfo)
                     tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
-
-            # Agrego archivos de la activity
-            # if activity_starting_files_id:
-            #     print("Agrego archivos de la activity")
-            #     with tarfile.open(tmpdir + '/activity_files.tar.gz') as activiy_files_tar:
-            #         for member_tarinfo in activiy_files_tar.getmembers():
-            #             member_fileobj = activiy_files_tar.extractfile(member_tarinfo)
-            #             tar.addfile(tarinfo=member_tarinfo, fileobj=member_fileobj)
 
             if activity_unit_test_file_content:
                 # Agrego archivo de test unitario
@@ -219,7 +209,7 @@ def ejecutar(submission_id, lang="c_std11"):
 
             # mandar resultado (json_output/result) POST al backend
             response = requests.post(
-                f"{producer_base_api}/api/submissions/{submission_id}/result",
+                f"{URL_RPL_BACKEND}/api/submissions/{submission_id}/result",
                 json=result,
             )
             if response.status_code != 201:

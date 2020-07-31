@@ -25,8 +25,14 @@ spec:
         securityContext:
           privileged: true
         env:
-        - name: QUEUE_SERVICE_HOST
-          value: queue
+        - name: QUEUE_URL
+          value: amqp://guest:guest@localhost:5672
+        - name: URL_RPL_BACKEND
+          value: http://producer:8080
+        - name: QUEUE_ACTIVITIES_NAME
+          value: hello
+        - name: DOCKER_RUNNER_IMAGE
+          value: gcr.io/fiuba-rpl/rpl-2.0-runner
         ports:
           - name: http
             containerPort: 8088

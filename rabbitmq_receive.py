@@ -3,8 +3,7 @@ import pika
 
 import receiver
 
-url = "amqp://whtzemgn:ANQGgE-43kGy8It949iDpznyJduJeODM@buck.rmq.cloudamqp.com/whtzemgn"
-
+from config import QUEUE_URL, QUEUE_ACTIVITIES_NAME, SYSTEMD
 
 def callback(ch, method, properties, body):
     decoded = body.decode("utf-8")
@@ -24,28 +23,27 @@ def callback(ch, method, properties, body):
 
 
 def start_consuming():
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='queue')
-        # pika.URLParameters(url)
-    )
+    connection = pika.BlockingConnection(pika.URLParameters(QUEUE_URL))
     channel = connection.channel()
 
     channel.queue_declare(
-        queue="hello", durable=True, arguments={"x-message-ttl": 3600000}
+        queue=QUEUE_ACTIVITIES_NAME, durable=True, arguments={"x-message-ttl": 3600000}
     )
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue="hello", on_message_callback=callback)
+    channel.basic_consume(queue=QUEUE_ACTIVITIES_NAME, on_message_callback=callback)
 
     print(" [*] Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
 
 
 if __name__ == "__main__":
-    # from systemd.daemon import notify, Notification
 
-    # print("Starting up ...")
-    # notify(Notification.READY)
-    # print("Startup complete")
+    if SYSTEMD:
+        from systemd.daemon import notify, Notification
+
+        print("Starting up ...")
+        notify(Notification.READY)
+        print("Startup complete")
 
     start_consuming()

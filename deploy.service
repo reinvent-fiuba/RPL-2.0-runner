@@ -6,11 +6,15 @@ Description=Python RPL rabbitmq_receive service
 # Command to execute when the service is started
 WorkingDirectory=/home/ale-vultr
 ExecStart=/usr/bin/python3 /home/ale-vultr/rpl_runner_receiver/rabbitmq_receive.py
-#ExecStart=/usr/bin/docker run hello-world
+
 User=ale-vultr
 # Disable Python's buffering of STDOUT and STDERR, so that output from the
 # service shows up immediately in systemd's logs
 Environment=PYTHONUNBUFFERED=1
+Environment=QUEUE_URL=amqp://whtzemgn:ANQGgE-43kGy8It949iDpznyJduJeODM@buck.rmq.cloudamqp.com/whtzemgn
+Environment=SYSTEMD=true
+Environment=URL_RPL_BACKEND=https://enigmatic-bayou-58033.herokuapp.com
+Environment=DOCKER_RUNNER_IMAGE=rpl-2.0-runner
 
 # Automatically restart the service if it crashes
 Restart=on-failure
