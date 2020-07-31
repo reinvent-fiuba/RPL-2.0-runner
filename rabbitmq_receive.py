@@ -40,10 +40,10 @@ def start_consuming():
 if __name__ == "__main__":
 
     if SYSTEMD:
-        from systemd.daemon import notify, Notification
+        from systemd.daemon import notify
 
         print("Starting up ...")
-        notify(Notification.READY)
+        notify("READY=1")
         print("Startup complete")
 
     start_consuming()
