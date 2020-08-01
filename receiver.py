@@ -217,9 +217,6 @@ def ejecutar(submission_id, lang="c_std11"):
                     f"Error al postear el resultado de la submission: {response.json()}"
                 )
 
-        # except Timeout:
-        # raise Error("TIMEOUT")
-
 
 if __name__ == "__main__":
     main()

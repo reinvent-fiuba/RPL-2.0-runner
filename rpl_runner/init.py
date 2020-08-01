@@ -5,7 +5,7 @@ import tarfile
 import tempfile
 
 from custom_runner import CRunner, PythonRunner
-from runner import RunnerError
+from runner import RunnerError, TimeOutError
 
 custom_runners = {"c_std11": CRunner, "python_3.7": PythonRunner}
 
@@ -64,6 +64,10 @@ def main():
                     result["test_run_result"] = "OK"
                     result["test_run_stage"] = "COMPLETE"
                     result["test_run_exit_message"] = "Completed all stages"
+                except TimeOutError as e:
+                    result["test_run_result"] = "TIME_OUT"
+                    result["test_run_stage"] = e.stage
+                    result["test_run_exit_message"] = e.message
                 except RunnerError as e:
                     result["test_run_result"] = "ERROR"
                     result["test_run_stage"] = e.stage
@@ -74,6 +78,7 @@ def main():
                     result["test_run_result"] = "UNKNOWN_ERROR"
                     result["test_run_stage"] = "unknown"
                     result["test_run_exit_message"] = str(e)
+                    raise e
 
                 # Get criterion unit tests results
                 if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":

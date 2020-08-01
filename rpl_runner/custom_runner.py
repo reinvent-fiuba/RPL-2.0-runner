@@ -22,6 +22,7 @@ class CRunner(Runner):
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.PIPE,
                     stderr=self.stderr,
+                    start_new_session=True,
                 ),
             )
         else:
@@ -54,6 +55,7 @@ class CRunner(Runner):
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.PIPE,
                     stderr=self.stderr,
+                    start_new_session=True,
                 ),
             )
             # TODO: Luego de compilar, borrar todos los ".c" para que no hagan print de las pruebas
@@ -88,6 +90,7 @@ class PythonRunner(Runner):
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=self.stderr,
+                start_new_session=True,
             ),
         )
 

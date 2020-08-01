@@ -6,7 +6,7 @@ RUN apt-get update     && \
                        make valgrind time python3.7 	\
                        libgtest-dev python3-pip
 
-RUN pip3 install pyinstaller
+RUN pip3 install pyinstaller timeout-decorator
 # Add runner
 ADD runner-libs/ /runner-libs/
 

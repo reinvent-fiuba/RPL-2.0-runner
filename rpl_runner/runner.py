@@ -1,3 +1,5 @@
+import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -9,6 +11,9 @@ class RunnerError(Exception):
         self.stage = stage
         self.message = message
 
+class TimeOutError(RunnerError):
+    def __init__(self, stage, message):
+        super().__init__(stage, message)
 
 class Runner:
     """
@@ -51,15 +56,17 @@ class Runner:
         self.logger.info(cmd_name)
         self.logger.info(f"start_{self.stage}")
         try:
-            output, _ = cmd_cmd.communicate(timeout)
+            output, _ = cmd_cmd.communicate(timeout=timeout)
 
         except subprocess.TimeoutExpired:
             cmd_cmd.kill()
-            msg = f"{self.stage} error\n  TIMEOUT {timeout}"
-            output, _ = cmd_cmd.communicate()
+            os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGTERM)  # Send the signal to all the process groups
+            output, error = cmd_cmd.communicate()
+            if error: self.log(error)
+            self.log("TIMEOUT")
 
         output = output.decode("utf-8", "replace").rstrip()
-        self.log(output)
+        if output: self.log(output)
         self.logger.info(f"end_{self.stage}")
 
         return output
@@ -83,6 +90,9 @@ class Runner:
         output = self.exec_cmd(build_cmd, self.BUILD_TIMEOUT)
 
         cmd_name, cmd_cmd = build_cmd
+        if cmd_cmd.returncode == -9:  # TIMEOUT
+            self.my_print(f"BUILD ERROR: error_code --> {cmd_cmd.returncode}")
+            raise TimeOutError(self.stage,f"Error en {cmd_name}. TIMEOUT")
         if cmd_cmd.returncode != 0:
             self.my_print(f"BUILD ERROR: error_code --> {cmd_cmd.returncode}")
             raise RunnerError(
@@ -104,6 +114,9 @@ class Runner:
         outputs = self.exec_cmds(run_cmds, self.RUN_TIMEOUT)
 
         for cmd_name, cmd_cmd in run_cmds:
+            if cmd_cmd.returncode == -9: # TIMEOUT
+                raise TimeOutError(self.stage,f"Error en {cmd_name}. TIMEOUT")
+
             if cmd_cmd.returncode != 0:
                 self.logger.info("RUN ERROR")
                 raise RunnerError(
@@ -132,11 +145,10 @@ class Runner:
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=self.stderr,
+                start_new_session=True,
             ),
         )
-        # return ("Building", subprocess.Popen(["gcc", "unit_test.c", "-o", "main", "-lcriterion", "-Wall", "-lm"], cwd=self.path, stdin=subprocess.DEVNULL,
-        # stdout=subprocess.PIPE, stderr=self.stderr))
-
+        
     def run_cmd(self):
         """
         Returns a list of tuples with the structure (<process_name>, <subprocess.Popen instante>)
@@ -157,6 +169,7 @@ class Runner:
                             stdin=subprocess.DEVNULL,
                             stdout=subprocess.PIPE,
                             stderr=self.stderr,
+                            start_new_session=True,
                         ),
                     )
                 ]
@@ -174,6 +187,7 @@ class Runner:
                             stdin=f,
                             stdout=subprocess.PIPE,
                             stderr=self.stderr,
+                            start_new_session=True,
                         ),
                     )
                 )
@@ -187,6 +201,7 @@ class Runner:
                         stdin=subprocess.DEVNULL,
                         stdout=subprocess.PIPE,
                         stderr=self.stderr,
+                        start_new_session=True,
                     ),
                 )
             ]
