@@ -61,12 +61,13 @@ class Runner:
         except subprocess.TimeoutExpired:
             cmd_cmd.kill()
             os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
-            output, error = cmd_cmd.communicate()
-            if error: self.log(error)
+            # output, error = cmd_cmd.communicate()  # Let's comment this until we can figure out how to kill subprocesses that subprocesses create (aka Criterion creating subproceses under new session IDs)
+            # if error: self.log(error)
             self.log("TIMEOUT")
 
-        output = output.decode("utf-8", "replace").rstrip()
-        if output: self.log(output)
+        if output: 
+            output = output.decode("utf-8", "replace").rstrip()
+            self.log(output)
         self.logger.info(f"end_{self.stage}")
 
         return output
