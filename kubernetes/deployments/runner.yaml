@@ -18,10 +18,11 @@ spec:
     spec:
       containers:
       - name: worker
-        image: gcr.io/fiuba-rpl/rpl-2.0-worker:latest
-        volumeMounts:
-        - name: dockersock
-          mountPath: "/var/run/docker.sock"
+        image: gcr.io/fiuba-rpl/rpl-2.0-worker
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "postStartHook.sh"]
         securityContext:
           privileged: true
         env:
@@ -32,16 +33,7 @@ spec:
         - name: QUEUE_ACTIVITIES_NAME
           value: hello
         - name: DOCKER_RUNNER_IMAGE
-          value: gcr.io/fiuba-rpl/rpl-2.0-runner:latest
+          value: gcr.io/fiuba-rpl/rpl-2.0-runner
         ports:
           - name: http
             containerPort: 8088
-      volumes:
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock  
-      initContainers:
-      - name: runner
-        image: gcr.io/fiuba-rpl/rpl-2.0-runner:latest
-        command: [ "/bin/sh", "-c", "echo holaaaa"]
-      
