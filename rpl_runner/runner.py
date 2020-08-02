@@ -60,7 +60,7 @@ class Runner:
 
         except subprocess.TimeoutExpired:
             cmd_cmd.kill()
-            os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGTERM)  # Send the signal to all the process groups
+            os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
             output, error = cmd_cmd.communicate()
             if error: self.log(error)
             self.log("TIMEOUT")
