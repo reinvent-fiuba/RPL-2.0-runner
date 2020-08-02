@@ -1,2 +1,6 @@
-dockerd &> dockerd-logfile &                # Start docker daemon
-docker pull gcr.io/fiuba-rpl/rpl-2.0-runner # Pull runner image 
+dockerd &> dockerd-logfile &     # Start docker daemon
+# Wait for docker daemon
+while (! docker stats --no-stream ); do
+  sleep 1
+done
+docker pull $DOCKER_RUNNER_IMAGE # Pull runner image
