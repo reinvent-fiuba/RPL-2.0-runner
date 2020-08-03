@@ -22,7 +22,7 @@ class Runner:
     """
 
     BUILD_TIMEOUT = 20
-    RUN_TIMEOUT = 60
+    RUN_TIMEOUT = 30
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """
@@ -59,8 +59,8 @@ class Runner:
             output, _ = cmd_cmd.communicate(timeout=timeout)
 
         except subprocess.TimeoutExpired:
-            cmd_cmd.kill()
             os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
+            cmd_cmd.kill()
             # output, error = cmd_cmd.communicate()  # Let's comment this until we can figure out how to kill subprocesses that subprocesses create (aka Criterion creating subproceses under new session IDs)
             # if error: self.log(error)
             self.log("TIMEOUT")
