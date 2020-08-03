@@ -22,7 +22,7 @@ class Runner:
     """
 
     BUILD_TIMEOUT = 20
-    RUN_TIMEOUT = 30
+    RUN_TIMEOUT = 10
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """
@@ -55,23 +55,27 @@ class Runner:
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
         self.logger.info(f"start_{self.stage}")
+        output = ""
         try:
             output, _ = cmd_cmd.communicate(timeout=timeout)
 
+            output = output.decode("utf-8", "replace").rstrip()            
+            self.log(output)            
+            self.logger.info(f"end_{self.stage}")
+
+            return output
+
         except subprocess.TimeoutExpired:
             os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
+            os.killpg(os.getpgid(cmd_cmd.pid + 1), signal.SIGKILL)  # For some reason it happens that we are not sending SIGKILL to the main process executed by Makefile. This makes sure we send SIGKILL to that process, and not to the Makefile process
             cmd_cmd.kill()
-            # output, error = cmd_cmd.communicate()  # Let's comment this until we can figure out how to kill subprocesses that subprocesses create (aka Criterion creating subproceses under new session IDs)
-            # if error: self.log(error)
+            output, error = cmd_cmd.communicate()
             self.log("TIMEOUT")
+            if error: self.log(error)
+            if output: self.log(output)
+            return "TIMEOUT"
 
-        if output: 
-            output = output.decode("utf-8", "replace").rstrip()
-            self.log(output)
-        self.logger.info(f"end_{self.stage}")
-
-        return output
-
+        
     def exec_cmds(self, cmds, timeout):
         """Lo mismo que la de arriba pero muchos comandos"""
         results = []
