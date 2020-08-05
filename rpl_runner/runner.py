@@ -22,7 +22,7 @@ class Runner:
     """
 
     BUILD_TIMEOUT = 20
-    RUN_TIMEOUT = 10
+    RUN_TIMEOUT = 20
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """

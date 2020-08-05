@@ -132,6 +132,8 @@ def get_unit_test_results(tmpdir, lang):
         capture_output=True,
         text=True,
     )
+    if not cat.stdout:
+        return None
     if lang == "c_std11":
         return get_custom_unit_test_results_json(json.loads(cat.stdout))
     return json.loads(cat.stdout)

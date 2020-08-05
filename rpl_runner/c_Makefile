@@ -1,7 +1,6 @@
 # Flags del compilador y de Valgrind.
 CC := gcc
 VALGRIND = valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2
-
 ARCHIVOS = $(wildcard *.c)
 ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.c, $(ARCHIVOS))
 
@@ -16,13 +15,13 @@ run:
 
 # Build only student files so we get a nice error message
 build_pre_unit_test: $(ARCHIVOS_SIN_UNIT_TEST)
-	$(CC) -c $^
+	$(CC) ${CFLAGS} -c $^
 
 
 # Build with criterion lib and delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build_unit_test: $(ARCHIVOS:.c=.o)
-	$(CC) -o main $^ -lcriterion
+	$(CC) ${CFLAGS} -o main $^ -lcriterion
 	@rm ${ARCHIVOS}
 
 run_unit_test:
