@@ -139,8 +139,9 @@ def get_unit_test_results(tmpdir, lang):
         if lang == "c_std11":
             return get_custom_unit_test_results_json(json.loads(cat.stdout))
         return json.loads(cat.stdout)
-    except json.decoder.JSONDecodeError:
-        return None
+    except json.decoder.JSONDecodeError as e:
+        print(e)
+        return cat.stdout
 
 
 # Check out util_files/salida_criterion.json to see raw format
