@@ -2,8 +2,9 @@
 import sys
 
 import pika
+from config import QUEUE_URL
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
+connection = pika.BlockingConnection(pika.URLParameters(QUEUE_URL))
 channel = connection.channel()
 
 channel.queue_declare(queue="hello", durable=True, arguments={"x-message-ttl": 3600000})

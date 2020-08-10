@@ -37,3 +37,5 @@ spec:
         ports:
           - name: http
             containerPort: 8088
+      nodeSelector:
+        runner: true
