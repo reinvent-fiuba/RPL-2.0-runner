@@ -208,15 +208,15 @@ def ejecutar(submission_id, lang="c_std11"):
 
             print(f"Código de retorno de ejecución: {retcode}")
 
-            # mandar resultado (json_output/result) POST al backend
-            response = requests.post(
-                f"{URL_RPL_BACKEND}/api/submissions/{submission_id}/result",
-                json=result,
-            )
-            if response.status_code != 201:
-                raise Exception(
-                    f"Error al postear el resultado de la submission: {response.json()}"
-                )
+            # # mandar resultado (json_output/result) POST al backend
+            # response = requests.post(
+            #     f"{URL_RPL_BACKEND}/api/submissions/{submission_id}/result",
+            #     json=result,
+            # )
+            # if response.status_code != 201:
+            #     raise Exception(
+            #         f"Error al postear el resultado de la submission: {response.json()}"
+            #     )
 
 
 if __name__ == "__main__":
