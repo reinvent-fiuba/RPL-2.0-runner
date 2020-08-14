@@ -43,6 +43,5 @@ spec:
             memory: 200Mi
           limits:
             cpu: 100m
-            memory: 512Mi
       nodeSelector:
         runner: "true"
