@@ -3,7 +3,6 @@ import pika
 import functools
 import receiver
 import threading
-from async_consumer import ReconnectingAsyncConsumer
 from config import QUEUE_URL, QUEUE_ACTIVITIES_NAME, SYSTEMD
 
 def ack_message(channel, delivery_tag):
