@@ -54,6 +54,7 @@ jobs:
       - name: Build worker
         run: |
           docker build -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$WORKER_IMAGE":"$GITHUB_SHA" \
+            -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$WORKER_IMAGE":latest \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF" .
 
@@ -67,6 +68,7 @@ jobs:
       - name: Build runner
         run: |
           docker build -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":"$GITHUB_SHA" \
+            -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":latest \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF" ./rpl_runner
 
