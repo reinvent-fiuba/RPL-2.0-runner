@@ -63,6 +63,7 @@ jobs:
       - name: Publish worker
         run: |
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:$GITHUB_SHA
+          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:latest
     
       # Build the Docker image
       - name: Build runner
@@ -76,6 +77,7 @@ jobs:
       - name: Publish runner
         run: |
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:$GITHUB_SHA
+          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:latest
 
       # Set up kustomize
       - name: Set up Kustomize
