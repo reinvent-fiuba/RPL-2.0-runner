@@ -136,7 +136,6 @@ def ejecutar(submission_id, lang="c_std11"):
                 "docker",
                 "run",
                 "--rm",
-                "--memory=100m",
                 "--interactive",
                 "--env",
                 "LANG=C.UTF-8",
