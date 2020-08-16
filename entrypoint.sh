@@ -10,4 +10,6 @@ docker load < /app/rpl-2.0-runner_latest.tar.gz
 
 docker image ls
 
+touch /tmp/healthy  # so that readiness probe is aware that we are ready to receive traffic / start consumming
+
 python3 -u rabbitmq_receive.py

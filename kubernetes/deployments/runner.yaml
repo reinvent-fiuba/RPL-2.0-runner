@@ -38,6 +38,14 @@ spec:
             cpu: 30m
             memory: 200Mi
           limits:
-            cpu: 100m
+            cpu: 300m
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy  # see entrypoint.sh
+          initialDelaySeconds: 60  # loading runner image takes like 90 seconds
+          periodSeconds: 10
+          failureThreshold: 10  # if after 60 + 100 seconds it isn't ready, restart
       nodeSelector:
         runner: "true"
