@@ -50,6 +50,27 @@ jobs:
           # via gcloud command-line tool.
           gcloud auth configure-docker
 
+      
+      # Build the Docker image
+      - name: Build runner
+        run: |
+          docker build -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":"$GITHUB_SHA" \
+            -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":latest \
+            -t "$RUNNER_IMAGE":latest \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg GITHUB_REF="$GITHUB_REF" ./rpl_runner
+
+      # Push the Docker image to Google Container Registry
+      - name: Publish runner
+        run: |
+          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:$GITHUB_SHA
+          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:latest
+      
+      # Push the Docker image to Google Container Registry
+      - name: Save runner to tar.gz
+        run: |
+          docker save $RUNNER_IMAGE:latest | gzip > rpl-2.0-runner_latest.tar.gz
+
       # Build the Docker image
       - name: Build worker
         run: |
@@ -64,20 +85,6 @@ jobs:
         run: |
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:$GITHUB_SHA
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:latest
-    
-      # Build the Docker image
-      - name: Build runner
-        run: |
-          docker build -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":"$GITHUB_SHA" \
-            -t "$REGISTRY_HOSTNAME"/"$GKE_PROJECT"/"$RUNNER_IMAGE":latest \
-            --build-arg GITHUB_SHA="$GITHUB_SHA" \
-            --build-arg GITHUB_REF="$GITHUB_REF" ./rpl_runner
-
-      # Push the Docker image to Google Container Registry
-      - name: Publish runner
-        run: |
-          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:$GITHUB_SHA
-          docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:latest
 
       # Set up kustomize
       - name: Set up Kustomize
