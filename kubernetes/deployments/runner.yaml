@@ -35,10 +35,11 @@ spec:
             containerPort: 8088
         resources:
           requests:
-            cpu: 30m
+            cpu: 50m
             memory: 200Mi
           limits:
             cpu: 300m
+            memory: 400Mi
         readinessProbe:
           exec:
             command:
