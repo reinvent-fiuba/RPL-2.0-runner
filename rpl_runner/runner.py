@@ -21,8 +21,8 @@ class Runner:
     either with unit tests or IO tests.
     """
 
-    BUILD_TIMEOUT = 20
-    RUN_TIMEOUT = 20
+    BUILD_TIMEOUT = 40
+    RUN_TIMEOUT = 40
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """
@@ -66,8 +66,16 @@ class Runner:
             return output
 
         except subprocess.TimeoutExpired:
-            os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
-            os.killpg(os.getpgid(cmd_cmd.pid + 1), signal.SIGKILL)  # For some reason it happens that we are not sending SIGKILL to the main process executed by Makefile. This makes sure we send SIGKILL to that process, and not to the Makefile process
+            try:
+                os.killpg(os.getpgid(cmd_cmd.pid), signal.SIGKILL)  # Send the signal to all the process groups
+            except OSError:
+                self.log(f"Process with PID {cmd_cmd.pid} does not exist")
+
+            try:
+                os.killpg(os.getpgid(cmd_cmd.pid + 1), signal.SIGKILL)  # For some reason it happens that we are not sending SIGKILL to the main process executed by Makefile. This makes sure we send SIGKILL to that process, and not to the Makefile process
+            except OSError:
+                self.log(f"Process with PID {cmd_cmd.pid + 1} does not exist")
+
             cmd_cmd.kill()
             output, error = cmd_cmd.communicate()
             self.log("TIMEOUT")
