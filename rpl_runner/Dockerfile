@@ -7,6 +7,8 @@ RUN apt-get update     && \
                        libgtest-dev python3-pip
 
 RUN pip3 install pyinstaller timeout-decorator
+RUN pip3 install flask
+RUN pip3 install gunicorn
 # Add runner
 ADD runner-libs/ /runner-libs/
 
@@ -20,7 +22,5 @@ RUN cp /runner-libs/python/unit_test_wrapper.py /usr
 
 COPY ["*.py", "*_Makefile", "/"]
 
-WORKDIR /tmp
 
-
-ENTRYPOINT ["/usr/bin/python3.7", "/init.py"]
+ENTRYPOINT ["gunicorn", "init_server:app"]

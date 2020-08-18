@@ -131,29 +131,30 @@ def ejecutar(submission_id, lang="c_std11"):
         # Lanzar ya el proceso worker para poder pasar su stdin a tarfile.open().
         # --rm --> clean up container after run
         #
-        with subprocess.Popen(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "--memory=100m",
-                "--interactive",
-                "--env",
-                "LANG=C.UTF-8",
-                "--env",
-                "CFLAGS=" + activity_compilation_flags,
-                DOCKER_RUNNER_IMAGE,
-                "--lang",
-                lang,
-                "--test-mode",
-                test_mode,
-            ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        ) as worker:
+        # with subprocess.Popen(
+        #     [
+        #         "docker",
+        #         "run",
+        #         "--rm",
+        #         "--memory=100m",
+        #         "--interactive",
+        #         "--env",
+        #         "LANG=C.UTF-8",
+        #         "--env",
+        #         "CFLAGS=" + activity_compilation_flags,
+        #         DOCKER_RUNNER_IMAGE,
+        #         "--lang",
+        #         lang,
+        #         "--test-mode",
+        #         test_mode,
+        #     ],
+        #     stdin=subprocess.PIPE,
+        #     stdout=subprocess.PIPE,
+        #     stderr=subprocess.STDOUT,
+        # ) as worker:
+        with tarfile.open("submission.tar", "w") as tar:
 
-            tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
+            # tar = tarfile.open(fileobj=worker.stdin, mode="w|", dereference=True)
 
             print("Agrego archivos de la submission")
             # Agrego archivos de la submission (incluyen los archivos de la activity por ahora)
@@ -184,18 +185,33 @@ def ejecutar(submission_id, lang="c_std11"):
                         fileobj=io.BytesIO(io_test.encode("utf-8")),
                     )
 
-            tar.close()
+            # tar.close()
+        with open("submission.tar", "rb") as sub_tar:
+
+            response = requests.post(
+                "http://127.0.0.1:8000/",
+                files={
+                    "file": ("submissionRECEIVED.tar", sub_tar),
+                    "cflags": (None, activity_compilation_flags),
+                    "lang": (None, lang),
+                    "test_mode": (None, test_mode),
+                },
+            )
+
+            print(response)
+
+            result = response.json()
 
             # Bloqueamos proceso hasta que el worker termine de correr la submission :)
-            stdout, _ = worker.communicate()
-            json_output = stdout.decode("utf-8", "replace")
-            retcode = worker.wait()
+            # stdout, _ = worker.communicate()
+            # json_output = stdout.decode("utf-8", "replace")
+            # retcode = worker.wait()
 
             print("Resultado:\n\n")
 
-            print(json_output)
+            print(json.dumps(result, indent=4))
 
-            result = json.loads(json_output)
+            # result = json.loads(json_output)
 
             # print(result)
 
@@ -206,7 +222,7 @@ def ejecutar(submission_id, lang="c_std11"):
             print(result["test_run_stderr"])
             print("################## STDERR ######################")
 
-            print(f"Código de retorno de ejecución: {retcode}")
+            # print(f"Código de retorno de ejecución: {retcode}")
 
             # mandar resultado (json_output/result) POST al backend
             response = requests.post(
