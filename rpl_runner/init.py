@@ -31,17 +31,23 @@ def main():
     lang = args.lang
     test_mode = args.mode
 
+    # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
+    # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
+    # seekable.
+
+    # Todavia no descubro como evitar tener que escribir y luego leer...
+    # Por ahora es un buen workarround
+    with open("assignment.tar.gx", "wb") as assignment:
+        assignment.write(sys.stdin.buffer.read())
+    
+    process(lang, test_mode, "assignment.tar.gx")
+
+
+def process(lang, test_mode, filename):
+
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
-        # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
-        # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
-        # seekable.
 
-        # Todavia no descubro como evitar tener que escribir y luego leer...
-        # Por ahora es un buen workarround
-        with open("assignment.tar.gx", "wb") as assignment:
-            assignment.write(sys.stdin.buffer.read())
-
-        with tarfile.open("assignment.tar.gx") as tar:
+        with tarfile.open(filename) as tar:
             tar.extractall(tmpdir)
 
             # Escribimos los logs, stdout y stderr en archivos temporarios para despues poder devolverlo
@@ -100,6 +106,7 @@ def main():
                 print(
                     json.dumps(result, indent=4)
                 )  # Contenido que recibe el proceso que ejecuta el contenedor docker
+                return result
 
 
 def parse_stdout(log_stdout):
@@ -172,4 +179,4 @@ def ls(dir):
     print(ls.stdout, file=sys.stderr)
 
 
-main()
+# main()
