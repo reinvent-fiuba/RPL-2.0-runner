@@ -40,10 +40,10 @@ COPY requirements.txt ./
 
 RUN pip3 install -r requirements.txt
 
-COPY rpl-2.0-runner_latest.tar.gz ./
+# COPY rpl-2.0-runner_latest.tar.gz ./
 
 COPY . ./
 
-RUN chmod a+x /app/entrypoint.sh
+# RUN chmod a+x /app/entrypoint.sh
 
-ENTRYPOINT ./entrypoint.sh
+ENTRYPOINT ["python3", "-u", "rabbitmq_receive.py"]

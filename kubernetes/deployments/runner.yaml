@@ -17,10 +17,20 @@ spec:
         track: stable
     spec:
       containers:
+      - name: runner
+        image: gcr.io/fiuba-rpl/rpl-2.0-runner
+        ports:
+          - name: http
+            containerPort: 8000
+        resources:
+          requests:
+            cpu: 50m
+            memory: 200Mi
+          limits:
+            cpu: 300m
+            memory: 400Mi
       - name: worker
         image: gcr.io/fiuba-rpl/rpl-2.0-worker
-        securityContext:
-          privileged: true
         env:
         - name: QUEUE_URL
           value: amqp://guest:guest@queue:5672
@@ -35,8 +45,8 @@ spec:
             containerPort: 8088
         resources:
           requests:
-            cpu: 50m
-            memory: 200Mi
+            cpu: 10m
+            memory: 100Mi
           limits:
             cpu: 300m
             memory: 400Mi
