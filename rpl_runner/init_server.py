@@ -5,19 +5,19 @@ import json
 
 from init import process
 
-UPLOAD_FOLDER = '/'
+UPLOAD_FOLDER = '/home/runner'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'tar'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# @app.route('/')
-# def hello_world():
-    # return 'Hello, World!'
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/health')
+def health():
+    return "pong"
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -29,8 +29,6 @@ def upload_file():
         file = request.files['file']
         # if user does not select file, browser also
         # submit an empty part without filename
-        print(request.files)
-        print(request.form)
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
@@ -43,8 +41,15 @@ def upload_file():
             lang = request.form['lang']
             test_mode = request.form['test_mode']
             # Vamos a tener que poner los flags como argumento, no podemos dejarlo como CFLAGS env variable
-
-            result = process(lang=lang, test_mode=test_mode, filename=dir)
+            try:
+                result = process(lang=lang, test_mode=test_mode, filename=dir, cflags=cflags)
+            except Exception as e:
+                result = {}
+                result["test_run_result"] = "UNKNOWN_ERROR"
+                result["test_run_stage"] = "unknown"
+                result["test_run_exit_message"] = str(e)
+            finally:
+                os.system(f'rm -r -f {UPLOAD_FOLDER}/*')
 
             return json.dumps(result)
 

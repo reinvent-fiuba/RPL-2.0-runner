@@ -21,8 +21,8 @@ class Runner:
     either with unit tests or IO tests.
     """
 
-    BUILD_TIMEOUT = 40
-    RUN_TIMEOUT = 40
+    BUILD_TIMEOUT = 20
+    RUN_TIMEOUT = 20
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """
@@ -231,6 +231,9 @@ class Runner:
         )
 
     def log(self, output):
+        '''
+        Used to write results of the executions
+        '''
         # self.log_divider(f"{self.stage} OUTPUT:", ":", '^', 150)
         self.my_print(output)
         # self.log_divider(f"END {self.stage} OUTPUT:", ":", '^', 150)
@@ -243,7 +246,8 @@ def get_logger(stdout):
     handler = logging.StreamHandler(stdout)
     formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # Need to overwrite handlers to dismiss previous runs stdour file descriptors
+    logger.handlers = [handler]
     logger.setLevel(logging.INFO)
 
     return logger
