@@ -32,4 +32,4 @@ ENV PYTHONUNBUFFERED=TRUE
 USER runner
 
 WORKDIR /home/runner
-ENTRYPOINT ["gunicorn", "--chdir", "/", "--timeout", "60", "init_server:app"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8000", "--chdir", "/", "--timeout", "60", "init_server:app"]

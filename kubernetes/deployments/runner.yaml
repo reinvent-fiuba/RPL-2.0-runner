@@ -34,6 +34,12 @@ spec:
           limits:
             cpu: 300m
             memory: 400Mi
+        readinessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          httpGet:
+            path: /health
+            port: 8000
       - name: worker
         image: gcr.io/fiuba-rpl/rpl-2.0-worker
         env:
