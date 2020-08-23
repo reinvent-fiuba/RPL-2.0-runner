@@ -83,14 +83,6 @@ class Runner:
             if output: self.log(output)
             return "TIMEOUT"
 
-        
-    def exec_cmds(self, cmds, timeout):
-        """Lo mismo que la de arriba pero muchos comandos"""
-        results = []
-        for cmd in cmds:
-            results.append(self.exec_cmd(cmd, timeout))
-        return results
-
     def build(self):
         """
         Build process.
@@ -124,9 +116,9 @@ class Runner:
 
         self.stage = "RUN"
         run_cmds = self.run_cmd()
-        outputs = self.exec_cmds(run_cmds, self.RUN_TIMEOUT)
 
         for cmd_name, cmd_cmd in run_cmds:
+            self.exec_cmd((cmd_name, cmd_cmd), self.RUN_TIMEOUT)
             if cmd_cmd.returncode == -9: # TIMEOUT
                 raise TimeOutError(self.stage,f"Error en {cmd_name}. TIMEOUT")
 

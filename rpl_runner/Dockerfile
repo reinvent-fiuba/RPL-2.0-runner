@@ -28,6 +28,7 @@ COPY ["*.py", "*_Makefile", "/"]
 
 RUN chown -R runner:runner /home/runner
 
+ENV PYTHONUNBUFFERED=TRUE
 USER runner
 
 WORKDIR /home/runner
