@@ -16,6 +16,8 @@ spec:
         tier: backend
         track: stable
     spec:
+      nodeSelector:
+        cloud.google.com/gke-preemptible: "true"
       tolerations:
       - effect: NoSchedule
         key: task
@@ -34,6 +36,12 @@ spec:
           limits:
             cpu: 300m
             memory: 400Mi
+        livenessProbe:
+          initialDelaySeconds: 40
+          periodSeconds: 60
+          httpGet:
+            path: /health
+            port: 8000
         readinessProbe:
           initialDelaySeconds: 60
           periodSeconds: 60
