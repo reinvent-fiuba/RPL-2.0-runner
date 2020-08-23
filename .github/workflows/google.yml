@@ -66,11 +66,6 @@ jobs:
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:$GITHUB_SHA
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:latest
       
-      # Push the Docker image to Google Container Registry
-      - name: Save runner to tar.gz
-        run: |
-          docker save $RUNNER_IMAGE:latest | gzip > rpl-2.0-runner_latest.tar.gz
-
       # Build the Docker image
       - name: Build worker
         run: |

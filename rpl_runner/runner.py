@@ -21,8 +21,8 @@ class Runner:
     either with unit tests or IO tests.
     """
 
-    BUILD_TIMEOUT = 40
-    RUN_TIMEOUT = 40
+    BUILD_TIMEOUT = 20
+    RUN_TIMEOUT = 20
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
         """
@@ -83,14 +83,6 @@ class Runner:
             if output: self.log(output)
             return "TIMEOUT"
 
-        
-    def exec_cmds(self, cmds, timeout):
-        """Lo mismo que la de arriba pero muchos comandos"""
-        results = []
-        for cmd in cmds:
-            results.append(self.exec_cmd(cmd, timeout))
-        return results
-
     def build(self):
         """
         Build process.
@@ -124,9 +116,9 @@ class Runner:
 
         self.stage = "RUN"
         run_cmds = self.run_cmd()
-        outputs = self.exec_cmds(run_cmds, self.RUN_TIMEOUT)
 
         for cmd_name, cmd_cmd in run_cmds:
+            self.exec_cmd((cmd_name, cmd_cmd), self.RUN_TIMEOUT)
             if cmd_cmd.returncode == -9: # TIMEOUT
                 raise TimeOutError(self.stage,f"Error en {cmd_name}. TIMEOUT")
 
@@ -231,6 +223,9 @@ class Runner:
         )
 
     def log(self, output):
+        '''
+        Used to write results of the executions
+        '''
         # self.log_divider(f"{self.stage} OUTPUT:", ":", '^', 150)
         self.my_print(output)
         # self.log_divider(f"END {self.stage} OUTPUT:", ":", '^', 150)
@@ -243,7 +238,8 @@ def get_logger(stdout):
     handler = logging.StreamHandler(stdout)
     formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # Need to overwrite handlers to dismiss previous runs stdour file descriptors
+    logger.handlers = [handler]
     logger.setLevel(logging.INFO)
 
     return logger

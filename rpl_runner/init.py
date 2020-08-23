@@ -3,6 +3,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import os
 
 from custom_runner import CRunner, PythonRunner
 from runner import RunnerError, TimeOutError
@@ -31,75 +32,73 @@ def main():
     lang = args.lang
     test_mode = args.mode
 
+    # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
+    # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
+    # seekable.
+
+    # Todavia no descubro como evitar tener que escribir y luego leer...
+    # Por ahora es un buen workarround
+    with open("assignment.tar.gx", "wb") as assignment:
+        assignment.write(sys.stdin.buffer.read())
+
+    process(lang, test_mode, "assignment.tar.gx")
+
+
+def process(lang, test_mode, filename, cflags=""):
+    os.environ['CFLAGS'] = cflags
+
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
-        # Usamos sys.stdin.buffer para leer en binario (sys.stdin es texto).
-        # Asimismo, el modo ‘r|’ (en lugar de ‘r’) indica que fileobj no es
-        # seekable.
 
-        # Todavia no descubro como evitar tener que escribir y luego leer...
-        # Por ahora es un buen workarround
-        with open("assignment.tar.gx", "wb") as assignment:
-            assignment.write(sys.stdin.buffer.read())
-
-        with tarfile.open("assignment.tar.gx") as tar:
+        with tarfile.open(filename) as tar:
             tar.extractall(tmpdir)
 
-            # Escribimos los logs, stdout y stderr en archivos temporarios para despues poder devolverlo
-            # y que el usuario vea que paso en su corrida
-            with tempfile.TemporaryFile(
-                mode="w+", encoding="utf-8"
-            ) as my_stdout, tempfile.TemporaryFile(
-                mode="w+", encoding="utf-8"
-            ) as my_stderr:
-
-                # Obtenemos el runner del lenguaje y modo seleccionado
-                test_runner = custom_runners[lang](
-                    tmpdir, test_mode, my_stdout, my_stderr
+        # Escribimos los logs, stdout y stderr en archivos temporarios para despues poder devolverlo
+        # y que el usuario vea que paso en su corrida
+        with tempfile.TemporaryFile(
+            dir=tmpdir, prefix="stdout.", mode="w+", encoding="utf-8"
+        ) as my_stdout, tempfile.TemporaryFile(
+            dir=tmpdir, prefix="stderr.", mode="w+", encoding="utf-8"
+        ) as my_stderr:
+            # Obtenemos el runner del lenguaje y modo seleccionado
+            test_runner = custom_runners[lang](tmpdir, test_mode, my_stdout, my_stderr)
+            result = {}
+            try:
+                # Comenzamos la corrida
+                test_runner.process()  # writes stuff to my_stdout and my_stderr
+                result["test_run_result"] = "OK"
+                result["test_run_stage"] = "COMPLETE"
+                result["test_run_exit_message"] = "Completed all stages"
+            except TimeOutError as e:
+                result["test_run_result"] = "TIME_OUT"
+                result["test_run_stage"] = e.stage
+                result["test_run_exit_message"] = e.message
+            except RunnerError as e:
+                result["test_run_result"] = "ERROR"
+                result["test_run_stage"] = e.stage
+                result["test_run_exit_message"] = e.message
+                # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
+            except Exception as e:
+                result["test_run_result"] = "UNKNOWN_ERROR"
+                result["test_run_stage"] = "unknown"
+                result["test_run_exit_message"] = str(e)
+                raise e
+            # Get criterion unit tests results
+            if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
+                result["test_run_unit_test_result"] = get_unit_test_results(
+                    tmpdir, lang
                 )
-
-                result = {}
-                try:
-                    # Comenzamos la corrida
-                    test_runner.process()  # writes stuff to my_stdout and my_stderr
-                    result["test_run_result"] = "OK"
-                    result["test_run_stage"] = "COMPLETE"
-                    result["test_run_exit_message"] = "Completed all stages"
-                except TimeOutError as e:
-                    result["test_run_result"] = "TIME_OUT"
-                    result["test_run_stage"] = e.stage
-                    result["test_run_exit_message"] = e.message
-                except RunnerError as e:
-                    result["test_run_result"] = "ERROR"
-                    result["test_run_stage"] = e.stage
-                    result["test_run_exit_message"] = e.message
-
-                    # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
-                except Exception as e:
-                    result["test_run_result"] = "UNKNOWN_ERROR"
-                    result["test_run_stage"] = "unknown"
-                    result["test_run_exit_message"] = str(e)
-                    raise e
-
-                # Get criterion unit tests results
-                if test_mode == "unit_test" and result["test_run_stage"] == "COMPLETE":
-                    result["test_run_unit_test_result"] = get_unit_test_results(
-                        tmpdir, lang
-                    )
-                else:
-                    result[
-                        "test_run_unit_test_result"
-                    ] = None  # Nice To have for debbuging
-
-                my_stdout.seek(0)
-                my_stderr.seek(0)
-                result["test_run_stdout"] = my_stdout.read()
-                result["test_run_stderr"] = my_stderr.read()
-                result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
-
-                # Escribimos en el stdout del proceso por única vez
-                print(
-                    json.dumps(result, indent=4)
-                )  # Contenido que recibe el proceso que ejecuta el contenedor docker
+            else:
+                result["test_run_unit_test_result"] = None  # Nice To have for debbuging
+            my_stdout.seek(0)
+            my_stderr.seek(0)
+            result["test_run_stdout"] = my_stdout.read()
+            result["test_run_stderr"] = my_stderr.read()
+            result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
+            # Escribimos en el stdout del proceso por única vez
+            print(
+                json.dumps(result, indent=4)
+            )  # Contenido que recibe el proceso que ejecuta el contenedor docker
+            return result
 
 
 def parse_stdout(log_stdout):
@@ -131,6 +130,7 @@ def get_unit_test_results(tmpdir, lang):
         cwd=tmpdir,
         capture_output=True,
         text=True,
+        errors='ignore',
     )
     if not cat.stdout:
         return None
@@ -172,4 +172,4 @@ def ls(dir):
     print(ls.stdout, file=sys.stderr)
 
 
-main()
+# main()

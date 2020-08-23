@@ -58,7 +58,6 @@ class CRunner(Runner):
                     start_new_session=True,
                 ),
             )
-            # TODO: Luego de compilar, borrar todos los ".c" para que no hagan print de las pruebas
 
 
 class PythonRunner(Runner):
