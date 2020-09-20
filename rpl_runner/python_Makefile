@@ -10,7 +10,7 @@ build_unit_test: $(ARCHIVOS)
 	/usr/bin/python3.7 /usr/custom_compileall.py
 
 run:
-	/usr/bin/python3.7 assignment_main.pyc
+	/usr/bin/python3.7 custom_IO_main.pyc
 
 run_unit_test:
 	/usr/bin/python3.7 unit_test_wrapper.pyc

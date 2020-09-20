@@ -70,6 +70,10 @@ class PythonRunner(Runner):
             shutil.copy(
                 "/usr/unit_test_wrapper.py", self.path + "/unit_test_wrapper.py"
             )
+        else:
+            shutil.copy(
+                "/usr/custom_IO_main.py", self.path + "/custom_IO_main.py"
+            )
 
     def build_cmd(self):
         """

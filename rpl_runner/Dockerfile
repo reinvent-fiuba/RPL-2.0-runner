@@ -23,8 +23,7 @@ ADD runner-libs/ /runner-libs/
 # Copy libcriterion files
 RUN tar -zxvf /runner-libs/c/criterion_rpl_v2.tar.gz -C /runner-libs/c/
 RUN cp -r /runner-libs/c/. /usr
-RUN cp /runner-libs/python/unit_test_wrapper.py /usr
-RUN cp /runner-libs/python/custom_compileall.py /usr
+RUN cp -r /runner-libs/python/. /usr
 
 COPY ["*.py", "*_Makefile", "/"]
 

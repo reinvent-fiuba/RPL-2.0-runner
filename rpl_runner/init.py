@@ -115,11 +115,11 @@ def parse_stdout(log_stdout):
         elif "start_RUN" in line:
             result = ""
 
-        elif "assignment_main.py" in line or "./main" in line:
+        elif "/usr/bin/python3.7" in line or "assignment_main.py" in line or "./main" in line:
             continue
 
         else:
-            result += line
+            result += line + "\n"
 
     return results
 
