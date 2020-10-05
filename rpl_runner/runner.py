@@ -238,7 +238,7 @@ def get_logger(stdout):
     handler = logging.StreamHandler(stdout)
     formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
-    # Need to overwrite handlers to dismiss previous runs stdour file descriptors
+    # Need to overwrite handlers to dismiss previous runs stdout file descriptors
     logger.handlers = [handler]
     logger.setLevel(logging.INFO)
 

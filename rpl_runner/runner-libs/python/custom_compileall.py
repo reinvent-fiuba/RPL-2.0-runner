@@ -1,6 +1,9 @@
 import compileall
+import sys
 
-compileall.compile_dir(".", force=True)
+sys.stdout = sys.stderr
+compileall.compile_dir(".", force=True, quiet=1)  # Only print errors, all to stderr
+sys.stdout = sys.__stdout__
 
 import os
 import shutil

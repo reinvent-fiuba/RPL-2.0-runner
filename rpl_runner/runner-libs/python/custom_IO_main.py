@@ -3,10 +3,12 @@ import builtins
 
 _input = input
 
-def my_input(arg):
+
+def my_input(arg=""):
     a = _input(arg)
     print(a)
     return a
+
 
 builtins.input = my_input
 

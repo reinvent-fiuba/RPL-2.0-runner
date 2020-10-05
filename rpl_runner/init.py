@@ -7,6 +7,9 @@ import os
 
 from custom_runner import CRunner, PythonRunner
 from runner import RunnerError, TimeOutError
+from logger import get_logger
+
+LOG = get_logger("RPL-2.0-worker-init")
 
 custom_runners = {"c_std11": CRunner, "python_3.7": PythonRunner}
 
@@ -45,10 +48,10 @@ def main():
 
 
 def process(lang, test_mode, filename, cflags=""):
-    os.environ['CFLAGS'] = cflags
+    os.environ["CFLAGS"] = cflags
 
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
-
+        LOG.info(f"Extracting tarfile submission from {filename}")
         with tarfile.open(filename) as tar:
             tar.extractall(tmpdir)
 
@@ -60,7 +63,9 @@ def process(lang, test_mode, filename, cflags=""):
             dir=tmpdir, prefix="stderr.", mode="w+", encoding="utf-8"
         ) as my_stderr:
             # Obtenemos el runner del lenguaje y modo seleccionado
+            LOG.info("Running custom runner")
             test_runner = custom_runners[lang](tmpdir, test_mode, my_stdout, my_stderr)
+            LOG.info("Custom runner ran succesfully")
             result = {}
             try:
                 # Comenzamos la corrida
@@ -76,7 +81,7 @@ def process(lang, test_mode, filename, cflags=""):
                 result["test_run_result"] = "ERROR"
                 result["test_run_stage"] = e.stage
                 result["test_run_exit_message"] = e.message
-                # print("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
+                LOG.error("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
             except Exception as e:
                 result["test_run_result"] = "UNKNOWN_ERROR"
                 result["test_run_stage"] = "unknown"
@@ -91,13 +96,10 @@ def process(lang, test_mode, filename, cflags=""):
                 result["test_run_unit_test_result"] = None  # Nice To have for debbuging
             my_stdout.seek(0)
             my_stderr.seek(0)
-            result["test_run_stdout"] = my_stdout.read()
-            result["test_run_stderr"] = my_stderr.read()
+            result["test_run_stdout"] = my_stdout.read(9999)  # we can only store up to 10k chars in the column
+            result["test_run_stderr"] = my_stderr.read(9999)
             result["stdout_only_run"] = parse_stdout(result["test_run_stdout"])
-            # Escribimos en el stdout del proceso por única vez
-            print(
-                json.dumps(result, indent=4)
-            )  # Contenido que recibe el proceso que ejecuta el contenedor docker
+            LOG.info(json.dumps(result, indent=4))
             return result
 
 
@@ -115,7 +117,11 @@ def parse_stdout(log_stdout):
         elif "start_RUN" in line:
             result = ""
 
-        elif "/usr/bin/python3.7" in line or "assignment_main.py" in line or "./main" in line:
+        elif (
+            "/usr/bin/python3.7" in line
+            or "assignment_main.py" in line
+            or "./main" in line
+        ):
             continue
 
         else:
@@ -130,32 +136,38 @@ def get_unit_test_results(tmpdir, lang):
         cwd=tmpdir,
         capture_output=True,
         text=True,
-        errors='ignore',
+        errors="ignore",
     )
     if not cat.stdout:
         return None
 
     try:
+        output = "".join(
+            c for c in cat.stdout if ord(c) >= 32
+        )  # sanitizing string as criterion output can add weird characters
         if lang == "c_std11":
-            return get_custom_unit_test_results_json(json.loads(cat.stdout))
-        return json.loads(cat.stdout)
+            return get_custom_unit_test_results_json(output)
+        return json.loads(output)
     except json.decoder.JSONDecodeError as e:
-        print(e)
-        return cat.stdout
+        LOG.exception(str(output).replace("\x03", ""))
+        return None
 
 
 # Check out util_files/salida_criterion.json to see raw format
 def get_custom_unit_test_results_json(criterion_json):
+    parsed_json = json.loads(str(criterion_json))
     result = {}
-    if criterion_json["test_suites"] and len(criterion_json["test_suites"]) > 0:
-        result["passed"] = criterion_json["passed"]
-        result["failed"] = criterion_json["failed"]
-        result["errored"] = criterion_json["errored"]
-        result["tests"] = criterion_json["test_suites"][0]["tests"]
+    if parsed_json["test_suites"] and len(parsed_json["test_suites"]) > 0:
+        result["passed"] = parsed_json["passed"]
+        result["failed"] = parsed_json["failed"]
+        result["errored"] = parsed_json["errored"]
+        result["tests"] = parsed_json["test_suites"][0]["tests"]
 
     for i in range(len(result["tests"])):
         if result["tests"][i]["status"] in ["FAILED", "ERRORED"]:
-            result["tests"][i]["messages"] = "\n".join(result["tests"][i]["messages"])
+            result["tests"][i]["messages"] = ";    ".join(
+                result["tests"][i]["messages"]
+            )
     return result
 
 
