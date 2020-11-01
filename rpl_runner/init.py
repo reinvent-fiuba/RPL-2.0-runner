@@ -81,7 +81,7 @@ def process(lang, test_mode, filename, cflags=""):
                 result["test_run_result"] = "ERROR"
                 result["test_run_stage"] = e.stage
                 result["test_run_exit_message"] = e.message
-                LOG.error("HUBO ERRORES :))))))", e.message, "en la etapa:", e.stage)
+                LOG.error("HUBO ERRORES: {message} en la etapa de {stage}".format(message=e.message, stage=e.stage))
             except Exception as e:
                 result["test_run_result"] = "UNKNOWN_ERROR"
                 result["test_run_stage"] = "unknown"
