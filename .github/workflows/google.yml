@@ -22,7 +22,7 @@ env:
   GKE_EMAIL: ${{ secrets.GKE_ALE_FIUBA_EMAIL }}
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: us-central1-c
-  GKE_CLUSTER: fiuba-rpl
+  GKE_CLUSTER: cluster-rpl-1
   WORKER_IMAGE: rpl-2.0-worker
   RUNNER_IMAGE: rpl-2.0-runner
   REGISTRY_HOSTNAME: gcr.io
