@@ -25,7 +25,7 @@ spec:
         value: preemptive
       containers:
       - name: runner
-        image: gcr.io/fiuba-rpl/rpl-2.0-runner
+        image: gcr.io/vigilant-mix-295715/rpl-2.0-runner
         ports:
           - name: http
             containerPort: 8000
@@ -43,7 +43,7 @@ spec:
             path: /health
             port: 8000
       - name: worker
-        image: gcr.io/fiuba-rpl/rpl-2.0-worker
+        image: gcr.io/vigilant-mix-295715/rpl-2.0-worker
         env:
         - name: QUEUE_URL
           value: amqp://guest:guest@queue:5672
