@@ -5,13 +5,27 @@ RUN apt-get update     && \
     apt-get install -y gcc gcc-multilib g++ clang      	\
                        make valgrind time python3.7 	\
                        python3.7-dev libgtest-dev       \
-                       python3-pip
+                       python3-pip default-jdk wget
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
+# Spark installation
+
+RUN wget https://apache.dattatec.com/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz && \
+	tar -zxvf spark-3.0.2-bin-hadoop2.7.tgz && \
+	mv spark-3.0.2-bin-hadoop2.7 /opt/spark
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+ENV PYSPARK_PYTHON=/usr/bin/python3
+
 RUN pip3 install pyinstaller timeout-decorator
 RUN pip3 install flask gunicorn
+RUN pip3 install pandas
+RUN pip3 install numpy
+RUN pip3 install scikit-learn
+RUN pip3 install pyspark
+RUN pip3 install findspark
 
 # Create usser for main process without root privileges 
 RUN groupadd -g 2500 runner
