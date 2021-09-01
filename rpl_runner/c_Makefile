@@ -7,7 +7,7 @@ ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.c, $(ARCHIVOS))
 # Delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build: $(ARCHIVOS:.c=.o)
-	$(CC) ${CFLAGS} -o main $^
+	$(CC) ${CFLAGS} -o main $^ ${LDFLAGS}
 	@rm ${ARCHIVOS}
 
 run:
@@ -15,13 +15,13 @@ run:
 
 # Build only student files so we get a nice error message
 build_pre_unit_test: $(ARCHIVOS_SIN_UNIT_TEST)
-	$(CC) ${CFLAGS} -c $^
+	$(CC) ${CFLAGS} -c $^ ${LDFLAGS}
 
 
 # Build with criterion lib and delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build_unit_test: $(ARCHIVOS:.c=.o)
-	$(CC) ${CFLAGS} -o main $^ -lcriterion
+	$(CC) ${CFLAGS} -o main $^ ${LDFLAGS} -lcriterion
 	@rm ${ARCHIVOS}
 
 run_unit_test:
