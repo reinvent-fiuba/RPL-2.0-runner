@@ -49,6 +49,9 @@ def main():
 
 def process(lang, test_mode, filename, cflags=""):
     os.environ["CFLAGS"] = cflags
+    if "-l" in cflags:
+        os.environ["CFLAGS"] = " ".join([x if "-l" not in x else "" for x in cflags.split()])
+        os.environ["LDFLAGS"] = " ".join([x if "-l" in x else "" for x in cflags.split()])
 
     with tempfile.TemporaryDirectory(prefix="corrector.") as tmpdir:
         LOG.info(f"Extracting tarfile submission from {filename}")
