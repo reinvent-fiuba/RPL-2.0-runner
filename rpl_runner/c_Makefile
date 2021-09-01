@@ -7,7 +7,7 @@ ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.c, $(ARCHIVOS))
 # Delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build: $(ARCHIVOS:.c=.o)
-	$(CC) ${CFLAGS} -o main $^
+	$(CC) ${CFLAGS} -o main $^ ${LDFLAGS}
 	@rm ${ARCHIVOS}
 
 run:
