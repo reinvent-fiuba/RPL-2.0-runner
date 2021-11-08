@@ -22,6 +22,8 @@ def get_unit_test_extension(lang):
         return "py"
     if "java" in lang:
         return "java"
+    if "go" in lang:
+        return "go"
     return "c"
 
 
