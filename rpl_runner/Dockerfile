@@ -11,7 +11,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
 RUN pip3 install pyinstaller timeout-decorator
-RUN pip3 install flask gunicorn
+RUN pip3 install markupsafe flask gunicorn
 
 # Create usser for main process without root privileges 
 RUN groupadd -g 2500 runner
