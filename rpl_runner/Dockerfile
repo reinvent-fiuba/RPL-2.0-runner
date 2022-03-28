@@ -7,10 +7,13 @@ RUN apt-get update     && \
                        python3.7-dev libgtest-dev       \
                        python3-pip
 
+# Fix for installing flask in ubuntu:bionic
+RUN apt-get install -y python3-markupsafe
+
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
-RUN pip3 install pyinstaller timeout-decorator
+RUN pip3 install timeout-decorator
 RUN pip3 install flask gunicorn
 
 # Create usser for main process without root privileges 
