@@ -18,8 +18,8 @@ RUN pip3 install flask gunicorn
 
 # Install go
 RUN apt-get install -y wget
-RUN wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
-RUN tar -xvf go1.16.4.linux-amd64.tar.gz
+RUN wget https://go.dev/dl/go1.19.3.linux-amd64.tar.gz
+RUN tar -xvf go1.19.3.linux-amd64.tar.gz
 RUN mv go /usr/lib
 
 ENV GOROOT /usr/lib/go
@@ -27,8 +27,6 @@ ENV GOPATH /go
 ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 
 RUN go version
-
-RUN go get github.com/stretchr/testify@v1.7.0
 
 # Create usser for main process without root privileges
 RUN groupadd -g 2500 runner
@@ -43,6 +41,8 @@ RUN cp -r /runner-libs/c/. /usr
 RUN cp -r /runner-libs/python/. /usr
 
 COPY ["go.mod", "go.sum", "*.py", "*_Makefile", "/"]
+
+RUN go get github.com/stretchr/testify@v1.7.0
 
 RUN chown -R runner:runner /home/runner
 RUN chown -R runner:runner /go
