@@ -28,7 +28,7 @@ ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 
 RUN go version
 
-RUN go get github.com/stretchr/testify
+RUN go get github.com/stretchr/testify@v1.7.0
 
 # Create usser for main process without root privileges
 RUN groupadd -g 2500 runner
