@@ -45,6 +45,7 @@ RUN cp -r /runner-libs/python/. /usr
 COPY ["go.mod", "go.sum", "*.py", "*_Makefile", "/"]
 
 RUN chown -R runner:runner /home/runner
+RUN chown -R runner:runner /go
 
 ENV PYTHONUNBUFFERED=TRUE
 USER runner

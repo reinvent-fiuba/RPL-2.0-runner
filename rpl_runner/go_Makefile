@@ -4,8 +4,7 @@ ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.go, $(ARCHIVOS))
 # Delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build:
-	ls
-	go test -c -o main
+	go build -o main
 	@rm ${ARCHIVOS}
 
 run:
@@ -18,7 +17,6 @@ build_pre_unit_test:
 # Build with criterion lib and delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build_unit_test:
-	ls
 	go test -c -o main
 	@rm ${ARCHIVOS}
 
