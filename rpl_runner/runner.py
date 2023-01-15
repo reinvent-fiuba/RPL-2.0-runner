@@ -21,7 +21,7 @@ class Runner:
     either with unit tests or IO tests.
     """
 
-    BUILD_TIMEOUT = 20
+    BUILD_TIMEOUT = 60
     RUN_TIMEOUT = 20
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
