@@ -44,6 +44,11 @@ jobs:
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
+      - uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
       # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           # Set up docker to authenticate
@@ -79,10 +84,6 @@ jobs:
         run: |
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:$GITHUB_SHA
           docker push $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:latest
-
-      - name: Install Google Auth Plugin
-        run: |
-          gcloud components install gke-gcloud-auth-plugin
 
       # Set up kustomize
       - name: Set up Kustomize
