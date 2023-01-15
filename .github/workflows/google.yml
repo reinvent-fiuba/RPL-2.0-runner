@@ -27,6 +27,7 @@ env:
   RUNNER_IMAGE: rpl-2.0-runner
   REGISTRY_HOSTNAME: gcr.io
   DEPLOYMENT_NAME: runner
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 #  API_BASE_URL: http://104.154.57.220
 
 
@@ -35,6 +36,10 @@ jobs:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Install Google Auth Plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -49,7 +54,6 @@ jobs:
           # via gcloud command-line tool.
           gcloud auth configure-docker
 
-      
       # Build the Docker image
       - name: Build runner
         run: |
