@@ -21,7 +21,7 @@ class Runner:
     either with unit tests or IO tests.
     """
 
-    BUILD_TIMEOUT = 60
+    BUILD_TIMEOUT = 20
     RUN_TIMEOUT = 20
 
     def __init__(self, path, test_type, stdout=sys.stdout, stderr=sys.stderr):
@@ -52,6 +52,8 @@ class Runner:
         Receives the command name (just for logging) and the actual subprocess.Popen instance
         Everything between 'start_*' and 'end_*' is what the student will see as output.
         """
+        self.my_print("Inside exec_cmd")
+
         cmd_name, cmd_cmd = cmd
         self.logger.info(cmd_name)
         self.logger.info(f"start_{self.stage}")

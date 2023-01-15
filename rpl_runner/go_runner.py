@@ -32,6 +32,7 @@ class GoRunner(Runner):
                 ),
             )
         else:
+            self.my_print("Before build_pre_unit_test")
             # First we check that the student files compile,
             # otherwise the error message will be mixed with criterion files
             build_only_sudent_files = subprocess.Popen(
@@ -44,6 +45,8 @@ class GoRunner(Runner):
 
             output, _ = build_only_sudent_files.communicate()
 
+            self.my_print("After build_pre_unit_test")
+
             if build_only_sudent_files.returncode != 0:
                 self.my_print(
                     f"BUILD ERROR: error_code --> {build_only_sudent_files.returncode}"
@@ -52,6 +55,8 @@ class GoRunner(Runner):
                     self.stage,
                     f"Error de compilación. Codigo Error {build_only_sudent_files.returncode}",
                 )
+
+            self.my_print("Before build_unit_test")
 
             return (
                 "Building",
