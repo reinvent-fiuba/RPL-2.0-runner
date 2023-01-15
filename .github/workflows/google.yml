@@ -48,6 +48,7 @@ jobs:
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
+          project_id: ${{ env.GKE_PROJECT }}
 
       # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
@@ -96,7 +97,6 @@ jobs:
       - name: Deploy
         run: |
           cd kubernetes
-          gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
           ./kustomize edit set image $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:${GITHUB_SHA}
           ./kustomize edit set image $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:${GITHUB_SHA}
           ./kustomize build . | kubectl apply -f -
