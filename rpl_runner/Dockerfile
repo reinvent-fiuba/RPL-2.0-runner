@@ -23,6 +23,7 @@ RUN tar -xvf go1.19.3.linux-amd64.tar.gz
 RUN mv go /usr/lib
 
 ENV GOROOT /usr/lib/go
+ENV GOCACHE /go/cache
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH
 
@@ -40,9 +41,15 @@ RUN tar -zxvf /runner-libs/c/criterion_rpl_v2.tar.gz -C /runner-libs/c/
 RUN cp -r /runner-libs/c/. /usr
 RUN cp -r /runner-libs/python/. /usr
 
-COPY ["go.mod", "go.sum", "*.py", "*_Makefile", "/"]
+COPY ["go.mod", "go.sum", "/"]
 
+# Cache testify dependency
 RUN go get github.com/stretchr/testify@v1.7.0
+
+# Cache testify build
+RUN go install github.com/stretchr/testify
+
+COPY ["*.py", "*_Makefile", "/"]
 
 RUN chown -R runner:runner /home/runner
 RUN chown -R runner:runner /go
