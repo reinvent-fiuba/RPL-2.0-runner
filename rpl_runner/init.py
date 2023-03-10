@@ -5,13 +5,20 @@ import tarfile
 import tempfile
 import os
 
-from custom_runner import CRunner, PythonRunner
+from python_runner import PythonRunner
+from c_runner import CRunner
+from go_runner import GoRunner
 from runner import RunnerError, TimeOutError
 from logger import get_logger
 
 LOG = get_logger("RPL-2.0-worker-init")
 
-custom_runners = {"c_std11": CRunner, "python_3.7": PythonRunner}
+custom_runners = {
+    "c_std11": CRunner,
+    "python_3.7": PythonRunner,
+    "go_1.16": GoRunner, # Just to have support for test submissions
+    "go_1.19": GoRunner
+}
 
 
 def parse_args():

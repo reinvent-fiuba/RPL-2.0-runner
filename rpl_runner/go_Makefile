@@ -1,0 +1,26 @@
+ARCHIVOS = $(wildcard *.go)
+ARCHIVOS_SIN_UNIT_TEST := $(filter-out unit_test.go, $(ARCHIVOS))
+
+# Delete source files so students can't read and print test cases
+# @ --> don't print command to stdout
+build:
+	go build -o main
+	@rm ${ARCHIVOS}
+
+run:
+	./main
+
+# Build only student files so we get a nice error message
+build_pre_unit_test:
+	go build ${ARCHIVOS_SIN_UNIT_TEST}
+
+# Build and delete source files so students can't read and print test cases
+# @ --> don't print command to stdout
+build_unit_test:
+	go test -c -o main
+	@rm ${ARCHIVOS}
+
+run_unit_test:
+	./main -test.v | python go_parser.py
+
+.PHONY: main clean

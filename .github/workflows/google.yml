@@ -27,6 +27,7 @@ env:
   RUNNER_IMAGE: rpl-2.0-runner
   REGISTRY_HOSTNAME: gcr.io
   DEPLOYMENT_NAME: runner
+  USE_GKE_GCLOUD_AUTH_PLUGIN: True
 #  API_BASE_URL: http://104.154.57.220
 
 
@@ -43,13 +44,18 @@ jobs:
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
+      - uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          project_id: ${{ env.GKE_PROJECT }}
+
       # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
           # Set up docker to authenticate
           # via gcloud command-line tool.
           gcloud auth configure-docker
 
-      
       # Build the Docker image
       - name: Build runner
         run: |
@@ -91,7 +97,6 @@ jobs:
       - name: Deploy
         run: |
           cd kubernetes
-          gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
           ./kustomize edit set image $REGISTRY_HOSTNAME/$GKE_PROJECT/$WORKER_IMAGE:${GITHUB_SHA}
           ./kustomize edit set image $REGISTRY_HOSTNAME/$GKE_PROJECT/$RUNNER_IMAGE:${GITHUB_SHA}
           ./kustomize build . | kubectl apply -f -
