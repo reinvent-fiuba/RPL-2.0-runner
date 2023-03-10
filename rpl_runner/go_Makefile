@@ -14,7 +14,7 @@ run:
 build_pre_unit_test:
 	go build ${ARCHIVOS_SIN_UNIT_TEST}
 
-# Build with criterion lib and delete source files so students can't read and print test cases
+# Build and delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build_unit_test:
 	go test -c -o main
