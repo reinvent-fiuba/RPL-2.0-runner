@@ -4,13 +4,13 @@ ARCHIVOS = $(wildcard *.py)
 # Then create binary and delete source files so students can't read and print test cases
 # @ --> don't print command to stdout
 build_io: $(ARCHIVOS)
-	/usr/bin/python3.7 /usr/custom_compileall.py
+	/usr/bin/python3.10 /usr/custom_compileall.py
 
 build_unit_test: $(ARCHIVOS)
-	/usr/bin/python3.7 /usr/custom_compileall.py
+	/usr/bin/python3.10 /usr/custom_compileall.py
 
 run:
-	/usr/bin/python3.7 custom_IO_main.pyc
+	/usr/bin/python3.10 custom_IO_main.pyc
 
 run_unit_test:
-	/usr/bin/python3.7 unit_test_wrapper.pyc
+	/usr/bin/python3.10 unit_test_wrapper.pyc
