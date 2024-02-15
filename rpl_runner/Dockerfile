@@ -1,17 +1,17 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 RUN apt-get update     && \
     apt-get upgrade -y && \
     apt-get install -y gcc gcc-multilib g++ clang      	\
-                       make valgrind time python3.7 	\
-                       python3.7-dev libgtest-dev       \
+                       make valgrind time python3.10 	\
+                       python3.10-dev libgtest-dev       \
                        python3-pip git
 
 # Fix for installing flask in ubuntu:bionic
 RUN apt-get install -y python3-markupsafe
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 
 RUN pip3 install timeout-decorator
 RUN pip3 install flask gunicorn

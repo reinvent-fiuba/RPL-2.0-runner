@@ -128,7 +128,7 @@ def parse_stdout(log_stdout):
             result = ""
 
         elif (
-            "/usr/bin/python3.7" in line
+            "custom_IO_main.pyc" in line
             or "assignment_main.py" in line
             or "./main" in line
         ):
