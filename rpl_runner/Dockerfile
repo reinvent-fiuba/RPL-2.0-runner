@@ -15,6 +15,7 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 
 RUN pip3 install timeout-decorator
 RUN pip3 install flask gunicorn
+RUN pip3 install pulp
 
 # Install go
 RUN apt-get install -y wget
